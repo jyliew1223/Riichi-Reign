@@ -1,0 +1,270 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/GameUI.uss?fileID=7433441132597879392&amp;guid=e5171a37264fd2e4fa16d0bbec96b0ab&amp;type=3#GameUI"/>
+    <ui:VisualElement name="ActionButtonContainer" style="flex-grow: 0; margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 10px; justify-content: space-around; align-items: flex-end; align-self: flex-end; width: 15%; display: none;">
+        <ui:Button text="Skip" name="SkipBtn" class="action-btn"/>
+        <ui:Button text="PON" name="PonBtn" class="action-btn" style="transition-duration: 0.2s;"/>
+        <ui:Button text="KAN" name="KanBtn" class="action-btn"/>
+        <ui:Button text="RON" name="RonBtn" class="action-btn"/>
+    </ui:VisualElement>
+    <ui:VisualElement name="Table" style="flex-grow: 1; width: 1080px; height: 1080px; align-self: center; border-top-width: 5px; border-right-width: 5px; border-bottom-width: 5px; border-left-width: 5px; border-left-color: rgb(173, 0, 0); border-right-color: rgb(173, 0, 0); border-top-color: rgb(173, 0, 0); border-bottom-color: rgb(173, 0, 0); background-color: rgb(45, 93, 141);">
+        <ui:VisualElement name="PlayerContainer3" style="flex-grow: 1; align-items: auto; justify-content: flex-end; flex-direction: row; position: absolute; width: 100%; height: 100%; rotate: 90deg;">
+            <ui:VisualElement name="Container" class="player-hand" style="width: 60%; left: 20%; right: 20%;">
+                <ui:VisualElement name="HandContainer" style="flex-grow: 0.9; flex-direction: row; align-items: center; justify-content: flex-end;">
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="TempTileContainer" style="flex-grow: 0.1; align-items: center; justify-content: center; align-self: auto; align-content: auto; flex-direction: row;">
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="PlayerContainer2" style="flex-grow: 1; align-items: auto; justify-content: flex-end; flex-direction: row; position: absolute; width: 100%; height: 100%; rotate: 180deg;">
+            <ui:VisualElement name="Container" class="player-hand" style="width: 60%; left: 20%; right: 20%;">
+                <ui:VisualElement name="HandContainer" style="flex-grow: 0.9; flex-direction: row; align-items: center; justify-content: flex-end;">
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="TempTileContainer" style="flex-grow: 0.1; align-items: center; justify-content: center; align-self: auto; align-content: auto; flex-direction: row;">
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="PlayerContainer1" style="flex-grow: 1; align-items: auto; justify-content: flex-end; flex-direction: row; position: absolute; width: 100%; height: 100%; rotate: -90deg;">
+            <ui:VisualElement name="Container" class="player-hand" style="width: 60%; left: 20%; right: 20%;">
+                <ui:VisualElement name="HandContainer" style="flex-grow: 0.9; flex-direction: row; align-items: center; justify-content: flex-end;">
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="TempTileContainer" style="flex-grow: 0.1; align-items: center; justify-content: center; align-self: auto; align-content: auto; flex-direction: row;">
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="PlayerContainer0" style="flex-grow: 1; align-items: auto; justify-content: flex-end; flex-direction: row; position: absolute; width: 100%; height: 100%;">
+            <ui:VisualElement name="Container" class="player-hand">
+                <ui:VisualElement name="HandContainer" style="flex-grow: 0.9; flex-direction: row; align-items: center; justify-content: flex-end;">
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement name="TempTileContainer" style="flex-grow: 0.1; align-items: center; justify-content: center; align-self: auto; align-content: auto; flex-direction: row; border-left-width: 20px; border-right-width: 10px;">
+                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                        <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
+                        <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="ToggleButtonsContainer" style="flex-grow: 1; position: absolute; width: 10%; height: 100%; justify-content: center; align-self: auto; align-items: flex-start; align-content: auto; padding-left: 10px;">
+        <ui:Toggle label="Sort" name="SortTileToggle"/>
+    </ui:VisualElement>
+</ui:UXML>

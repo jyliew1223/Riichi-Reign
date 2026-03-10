@@ -1,0 +1,137 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: babb087e70a3b514c83efa8a17f1cefa, type: 3}
+  m_Name: TileTextureDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::TileTextureDatabase
+  backgroundKey: Back
+  blankKey: Blank
+  entries:
+  - key: Back
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: ea81fa8960b40984499aaa406bc1e27d, type: 3}
+  - key: Blank
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 374c4bf558688be4ebb020cc526b71a2, type: 3}
+  - key: Chun
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 63e9cb752019ca54f95cfeea55222523, type: 3}
+  - key: Front
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+  - key: Haku
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 54c6c40abb77d8a428f81c1e3d16df33, type: 3}
+  - key: Hatsu
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: e9b974b5f5c53d1419e2831c515bbdb7, type: 3}
+  - key: Man1
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: db4fe2bfea050ea44858c193f4a61626, type: 3}
+  - key: Man2
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 596877e33b1028b4aa157010b7ed8aae, type: 3}
+  - key: Man3
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 6a40e4ce80e7378439d7eeb625e361dc, type: 3}
+  - key: Man4
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 7dff57cb569c7104a8f87d94febf262a, type: 3}
+  - key: Man5-Dora
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: c4762b3d13503dc47bac2bf32587dfd3, type: 3}
+  - key: Man5
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 9d57ce73160e0d24cbdf748a77cee1db, type: 3}
+  - key: Man6
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 4c7c4c76f97bf52419410c19fe73693b, type: 3}
+  - key: Man7
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: fd13ed5a05ef5274e9056dd2ef77b550, type: 3}
+  - key: Man8
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: bee726d5b3298d340be94a538447acda, type: 3}
+  - key: Man9
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 6bb40587dd6088d4080f6691dd7c1104, type: 3}
+  - key: Nan
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: de9e6482d037aea4daef9ff18b7e7f9c, type: 3}
+  - key: Pei
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: b6c3362acb871624fada1abb396ea542, type: 3}
+  - key: Pin1
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: bbcf925d0d3fb5742bedb95cd6b46512, type: 3}
+  - key: Pin2
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 6d15bf0f390ae544a8ef879b963563a7, type: 3}
+  - key: Pin3
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: cd78a76a50e03b545bdd0946ae431000, type: 3}
+  - key: Pin4
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: e425169c94af9a742b2c3b176932ec37, type: 3}
+  - key: Pin5-Dora
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 65e4ce6a20fd28c4c86e1e5dadca162e, type: 3}
+  - key: Pin5
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: f2160749be752734386cc6b6659c2536, type: 3}
+  - key: Pin6
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 25c57d432be33cc4b94908f2463877d4, type: 3}
+  - key: Pin7
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 756b0503c690bfc46ad92e95988e9f71, type: 3}
+  - key: Pin8
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 1998276102c88a144819d0e28d731307, type: 3}
+  - key: Pin9
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: d0ab486cd2d96b74fa79407dfd09cf0f, type: 3}
+  - key: Shaa
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 1939b863e3a469c4082f22282829bcd4, type: 3}
+  - key: Sou1
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 049f251f851a3934c8c7e5027586eb98, type: 3}
+  - key: Sou2
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 5d75368f61e9238449b65dd3c1df7f23, type: 3}
+  - key: Sou3
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: c4eb4a94ca7002c4686cf99fdb430594, type: 3}
+  - key: Sou4
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 332822e70ffc90b4e9fa20cdce3551b3, type: 3}
+  - key: Sou5-Dora
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 0f5dd3a880b853148bc661e62ddb51cc, type: 3}
+  - key: Sou5
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 57698afa98c0d6b44925f41e0cf08b1a, type: 3}
+  - key: Sou6
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 6d3a6ea921936cf489d06b5cfc80f324, type: 3}
+  - key: Sou7
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 4e1ad75651cdd6e44a0245f1414cea7c, type: 3}
+  - key: Sou8
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: e7865badd076f814abca2697eb954e1a, type: 3}
+  - key: Sou9
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: 1b9e69b87eeb2ba41934bc6fba986374, type: 3}
+  - key: Ton
+    background: {fileID: 2800000, guid: 325f968915a3bdf45a8568172798a3aa, type: 3}
+    face: {fileID: 2800000, guid: cdcdf5bb90d3f0a489540844853ce8e1, type: 3}
