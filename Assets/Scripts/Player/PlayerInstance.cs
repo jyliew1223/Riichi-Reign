@@ -2,14 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using Newtonsoft.Json;
-using NUnit.Framework;
 using RiichiReign.GameComponent;
-using RiichiReign.UnityComponent;
-using Unity.Netcode;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace RiichiReign.Player
@@ -28,40 +22,34 @@ namespace RiichiReign.Player
 
     public class PlayerInstance : IComparable<PlayerInstance>, IEquatable<PlayerInstance>
     {
-        [JsonProperty("playerID")]
-        public int playerID { get; private set; }
+        [JsonProperty("PlayerNetworkID")]
+        public ulong PlayerNetworkID { get; private set; }
 
         [JsonProperty("hand")]
         public PlayerHand Hand { get; private set; }
 
-        private PlayerAction selectedAction = PlayerAction.None;
-        private float timeoutDuration = 1f;
+        List<PlayerAction> _availableActions = new();
+        PlayerAction _selectedAction = new(GameAction.None);
 
         #region Constructors
 
-        public PlayerInstance()
+        public PlayerInstance(ulong PlayerNetworkID)
         {
             Hand = new PlayerHand();
-            playerID = UnityEngine.Random.Range(1, 10000);
-            Debug.Log("Generating new PlayerInstance:" + playerID);
+            this.PlayerNetworkID = PlayerNetworkID;
         }
 
         [JsonConstructor]
-        private PlayerInstance(int playerID, PlayerHand hand)
+        private PlayerInstance(ulong PlayerNetworkID, PlayerHand hand)
         {
-            this.playerID = playerID;
+            this.PlayerNetworkID = PlayerNetworkID;
             this.Hand = hand ?? new();
         }
 
         public PlayerInstance(PlayerInstance other)
         {
             this.Hand = other.Hand;
-            this.playerID = other.playerID;
-        }
-
-        ~PlayerInstance()
-        {
-            Debug.Log("Destorying Player: " + this);
+            this.PlayerNetworkID = other.PlayerNetworkID;
         }
 
         #endregion
@@ -70,7 +58,7 @@ namespace RiichiReign.Player
 
         #region Turn Logics
 
-        #region Extra Game Actions
+        #region Start Phase
 
         public void DrawInitialTile(Pool pool)
         {
@@ -80,35 +68,7 @@ namespace RiichiReign.Player
 
         #endregion
 
-        public IEnumerator KyushukyuhaiAbortCoroutine(System.Action<PlayerReaction> callback)
-        {
-            if (Hand.CheckKyushukyuhai() == PlayerAction.Kyushukyuhai)
-            {
-                selectedAction = PlayerAction.None;
-
-                float elapsedTime = 0;
-                while (elapsedTime < timeoutDuration)
-                {
-                    if (selectedAction != PlayerAction.None)
-                    {
-                        callback?.Invoke(new(this, selectedAction));
-                        yield break;
-                    }
-
-                    elapsedTime += Time.deltaTime;
-                    yield return null;
-                }
-
-                if (elapsedTime > timeoutDuration)
-                {
-                    Debug.Log(
-                        $"Player {playerID} did not select an action within the timeout period."
-                    );
-                }
-            }
-
-            callback?.Invoke(new(this, selectedAction));
-        }
+        #region Draw Phase
 
         public void DrawPhase(Pool pool)
         {
@@ -117,9 +77,38 @@ namespace RiichiReign.Player
 
         #endregion
 
+        #region Action Phase
+
+        public void CheckAvailableAction()
+        {
+            if (_availableActions != null || _availableActions.Count != 0)
+                _availableActions.Clear();
+
+            List<PlayerAction> availableActions = Hand.CheckAvailableAction();
+            _availableActions = availableActions;
+        }
+
+        #endregion
+
+        #endregion
+
         #region Hand Management
 
         public int HandTilesCount() => Hand.TotalTilesCount();
+
+        public string DebugLog()
+        {
+            StringBuilder stringBuilder = new();
+
+            stringBuilder.AppendLine($"Player: {PlayerNetworkID}");
+            stringBuilder.AppendLine($"Tiles in Hand: {Hand.TilesInHand.Count}");
+            stringBuilder.AppendLine($"Melds: {Hand.Melds.Count}");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("Hand:");
+            stringBuilder.AppendLine(Hand.ToString());
+
+            return stringBuilder.ToString();
+        }
 
         #endregion
 
@@ -131,12 +120,7 @@ namespace RiichiReign.Player
         {
             StringBuilder stringBuilder = new();
 
-            stringBuilder.AppendLine($"Player: {playerID}");
-            stringBuilder.AppendLine($"Tiles in Hand: {Hand.TilesInHand.Count}");
-            stringBuilder.AppendLine($"Melds: {Hand.Melds.Count}");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine("Hand:");
-            stringBuilder.AppendLine(Hand.ToString());
+            stringBuilder.AppendLine($"Player{PlayerNetworkID}");
 
             return stringBuilder.ToString();
         }
@@ -148,7 +132,7 @@ namespace RiichiReign.Player
 
         public override int GetHashCode()
         {
-            return playerID.GetHashCode();
+            return PlayerNetworkID.GetHashCode();
         }
 
         #endregion
@@ -160,14 +144,14 @@ namespace RiichiReign.Player
             if (other == null)
                 return 1;
 
-            return playerID.CompareTo(other.playerID);
+            return PlayerNetworkID.CompareTo(other.PlayerNetworkID);
         }
 
         public bool Equals(PlayerInstance other)
         {
             if (other == null)
                 return false;
-            return playerID == other.playerID;
+            return PlayerNetworkID == other.PlayerNetworkID;
         }
 
         public static bool operator ==(PlayerInstance a, PlayerInstance b)
@@ -176,7 +160,7 @@ namespace RiichiReign.Player
                 return true;
             if (a is null || b is null)
                 return false;
-            return a.playerID == b.playerID;
+            return a.PlayerNetworkID == b.PlayerNetworkID;
         }
 
         public static bool operator !=(PlayerInstance a, PlayerInstance b)

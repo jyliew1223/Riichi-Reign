@@ -1,13 +1,9 @@
-
-using Unity.Netcode;
-using Unity.Services.Multiplayer;
-using UnityEngine.XR;
-
 namespace RiichiReign.GameComponent
 {
     [System.Serializable]
     public abstract class IMeldType { }
 
+    [System.Serializable]
     class Pon : IMeldType
     {
         public Tile Tile { get; private set; }
@@ -18,6 +14,7 @@ namespace RiichiReign.GameComponent
         }
     }
 
+    [System.Serializable]
     class Chi : IMeldType
     {
         public Tile Tile1 { get; private set; }
@@ -32,11 +29,13 @@ namespace RiichiReign.GameComponent
         }
     }
 
+    [System.Serializable]
     class Kan : IMeldType
     {
         public Tile Tile { get; protected set; }
     }
 
+    [System.Serializable]
     class CloseKan : Kan
     {
         public CloseKan(Tile tile)
@@ -45,6 +44,7 @@ namespace RiichiReign.GameComponent
         }
     }
 
+    [System.Serializable]
     class OpenKan : Kan
     {
         public OpenKan(Tile tile)
@@ -53,6 +53,7 @@ namespace RiichiReign.GameComponent
         }
     }
 
+    [System.Serializable]
     class AddKan : Kan
     {
         public AddKan(Tile tile)

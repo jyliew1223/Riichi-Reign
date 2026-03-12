@@ -1,6 +1,4 @@
 using RiichiReign.GameComponent;
-using UnityEngine;
-using UnityEngine.Assertions.Must;
 using UnityEngine.UIElements;
 
 namespace RiichiReign.UI

@@ -5,8 +5,7 @@ using UnityEngine;
 
 namespace RiichiReign.GameAsset
 {
-    [CreateAssetMenu(fileName = "TileTextureDatabase",
-                     menuName = "Mahjong/Tile Texture Database")]
+    [CreateAssetMenu(fileName = "TileTextureDatabase", menuName = "Mahjong/Tile Texture Database")]
     public class TileTextureAsset : ScriptableObject
     {
         [System.Serializable]
@@ -19,8 +18,10 @@ namespace RiichiReign.GameAsset
 
         [SerializeField]
         string backgroundKey = "Back";
+
         [SerializeField]
         string blankKey = "Blank";
+
         [SerializeField]
         List<TileTextureEntry> entries = new();
 
@@ -48,16 +49,19 @@ namespace RiichiReign.GameAsset
             foreach (string filePath in files)
             {
                 Texture2D frontTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(filePath);
-                if (frontTexture == null) continue;
+                if (frontTexture == null)
+                    continue;
 
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
 
-                entries.Add(new TileTextureEntry
-                {
-                    key = fileName,
-                    background = backTexture,
-                    face = frontTexture
-                });
+                entries.Add(
+                    new TileTextureEntry
+                    {
+                        key = fileName,
+                        background = backTexture,
+                        face = frontTexture,
+                    }
+                );
             }
 
             // Mark asset dirty so Unity saves it

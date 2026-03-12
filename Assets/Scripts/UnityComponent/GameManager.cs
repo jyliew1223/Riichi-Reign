@@ -1,20 +1,15 @@
-using System.Collections.Generic;
-using RiichiReign.GameComponent;
 using RiichiReign.Player;
 using UnityEngine;
 
 namespace RiichiReign.UnityComponent
 {
-    public class GameManager : MonoBehaviour
+    internal class GameManager : MonoBehaviour
     {
         [SerializeField]
-        bool StartGame = false;
+        bool _startGame = false;
 
         public static GameManager Instance { get; private set; }
         public bool HasGameEnded { get; private set; } = false;
-
-        Pool pool;
-        List<PlayerInstance> players;
 
         #region Unity Logics
 
@@ -28,16 +23,11 @@ namespace RiichiReign.UnityComponent
             Instance = this;
         }
 
-        void Start()
-        {
-            players = new();
-        }
-
         void Update()
         {
-            if (StartGame)
+            if (_startGame)
             {
-                StartGame = false;
+                _startGame = false;
                 StartGameLoop();
             }
         }
@@ -54,22 +44,27 @@ namespace RiichiReign.UnityComponent
 
         #region Game Loop Logic
 
+        #region Start Game Logics
+
         void StartGameLoop()
         {
             // Initialize players
             InitPlayers();
-
-            PlayerInstance winner = TurnManager.Instance.StartTurn(players);
+            PlayerInstance winner = TurnManager.Instance.StartTurn();
         }
-
-        #endregion
-
-        #region Start Game Logics
 
         void InitPlayers()
         {
-            PlayerManager.Instance.StartInitializePlayersRPC();
+            if (PlayerManager.Server.IsReady)
+                PlayerManager.Server.InitializePlayer();
+            else
+                Debug.LogError(
+                    $"[{GetType().Name}] Getting PlayerInstance while it's not Ready",
+                    this
+                );
         }
+
+        #endregion
 
         #endregion
     }

@@ -1,9 +1,5 @@
 using System;
-using System.Net.WebSockets;
 using Newtonsoft.Json;
-using NUnit.Framework.Constraints;
-using Unity.Netcode;
-using UnityEngine.XR;
 
 namespace RiichiReign.GameComponent
 {
@@ -17,7 +13,7 @@ namespace RiichiReign.GameComponent
         Dragon,
     }
 
-    public class Tile : IComparable<Tile>
+    public class Tile : IComparable<Tile>, IEquatable<Tile>
     {
         [JsonProperty("type")]
         public TileType Type { get; protected set; }
@@ -54,7 +50,7 @@ namespace RiichiReign.GameComponent
 
         #endregion
 
-        #region Public Methods
+        #region Methods
 
         public bool IsTerminal()
         {
@@ -138,12 +134,29 @@ namespace RiichiReign.GameComponent
             return $"{Type} {Value} {(IsRedDora ? "(Red Dora)" : "")}";
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            return Equals(obj as Tile);
+        }
+
+        public override int GetHashCode()
+        {
+            return (Type, Value).GetHashCode();
+        }
+
         #endregion
 
         #region Implementations
 
         public int CompareTo(Tile other)
         {
+            if (ReferenceEquals(this, other))
+                return 0;
             if (other == null)
                 return 1;
 
@@ -151,9 +164,36 @@ namespace RiichiReign.GameComponent
             if (typeComparison != 0)
                 return typeComparison;
 
-            return Value.CompareTo(other.Value);
+            int valueComparison = Value.CompareTo(other.Value);
+            if (valueComparison != 0)
+                return valueComparison;
+
+            return IsRedDora.CompareTo(other.IsRedDora);
         }
 
+        public bool Equals(Tile other)
+        {
+            if (other == null)
+                return false;
+
+            bool result = Type == other.Type && Value == other.Value;
+
+            return result;
+        }
+
+        public static bool operator ==(Tile a, Tile b)
+        {
+            if (ReferenceEquals(a, b))
+                return true;
+            if (a is null || b is null)
+                return false;
+            return a.Equals(b);
+        }
+
+        public static bool operator !=(Tile a, Tile b)
+        {
+            return !(a == b);
+        }
         #endregion
     }
 }
