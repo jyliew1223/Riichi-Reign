@@ -18,10 +18,10 @@ This project aims to create a highly extensible Mahjong framework. While Phase 1
 
 ## 🕹️ Features (Phase 1)
 
-- [-] **Full Turn-Based Loop:** Drawing, discarding, and turn-switching logic.
+- [x] **Full Turn-Based Loop:** Drawing, discarding, and turn-switching logic.
 - [x] **Action System:** Validated implementation of **Chi**, **Pon**, **Kan**, and **Riichi**.
 - [x] **Yaku Evaluation:** Core logic for standard winning hands and point calculation.
-- **Multiplayer Sync:** Initial host-client connectivity for remote play.
-- **Dynamic Hand UI:** Interactive tile management using UIToolkit.
+- [x] **Multiplayer Sync:** Initial host-client connectivity for remote play.
+- [x] **Dynamic Hand UI:** Interactive tile management using UIToolkit.
 
 ---
