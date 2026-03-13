@@ -20,9 +20,9 @@ namespace RiichiReign.UnityComponent
         private static PlayerManager _instance;
         private PlayerUIController _localPlayerUI;
 
-        #region Unity Logics
+        #region Netcode Logics
 
-        void Awake()
+        public override void OnNetworkSpawn()
         {
             if (_instance != null)
             {
@@ -31,41 +31,41 @@ namespace RiichiReign.UnityComponent
             }
 
             _instance = this;
-        }
 
-        void Destroy()
-        {
-            if (_instance == this)
-            {
-                _instance = null;
-            }
-        }
-
-        #endregion
-
-        #region Netcode Logics
-
-        public override void OnNetworkSpawn()
-        {
             IsReady = true;
-            _instance.PlayerListJson.OnValueChanged += HandleOnValueChanged;
+            PlayerListJson.OnValueChanged += HandleOnValueChanged;
 
             StringBuilder stringBuilder = new();
             stringBuilder.AppendLine($"[{GetType().Name}] Network spawned:");
-            stringBuilder.AppendLine("IsServer: " + _instance.IsServer);
-            stringBuilder.AppendLine("IsLocalPlayer: " + _instance.IsLocalPlayer);
-            stringBuilder.AppendLine("IsHost: " + _instance.IsHost);
-            stringBuilder.AppendLine("IsClient: " + _instance.IsClient);
+            stringBuilder.AppendLine("IsServer: " + IsServer);
+            stringBuilder.AppendLine("IsLocalPlayer: " + IsLocalPlayer);
+            stringBuilder.AppendLine("IsHost: " + IsHost);
+            stringBuilder.AppendLine("IsClient: " + IsClient);
 
             Debug.Log(stringBuilder.ToString());
         }
 
-        public static PlayerManager Server => _instance.IsServer ? _instance : null;
-        public static PlayerManager Local => _instance.IsClient ? _instance : null;
+        public static PlayerManager Server =>
+            _instance.IsServer
+                ? _instance
+                : throw new System.Exception(
+                    $"[{_instance.GetType().Name}] Local instance is not server instance"
+                );
+        public static PlayerManager Local =>
+            _instance.IsClient
+                ? _instance
+                : throw new System.Exception(
+                    $"[{_instance.GetType().Name}] Local instance is not client instance"
+                );
 
         public override void OnNetworkDespawn()
         {
-            _instance.PlayerListJson.OnValueChanged -= HandleOnValueChanged;
+            PlayerListJson.OnValueChanged -= HandleOnValueChanged;
+
+            if (_instance == this)
+            {
+                _instance = null;
+            }
         }
 
         #endregion
@@ -81,7 +81,9 @@ namespace RiichiReign.UnityComponent
         public void AddPlayer(ulong networkID)
         {
             if (!IsServer)
-                throw new System.Exception("Calling server method in client machine");
+                throw new System.Exception(
+                    $"[{GetType().Name}] Calling server method in client machine"
+                );
 
             PlayerInstance player = new(networkID);
             PlayerList.Add(player);
@@ -91,7 +93,9 @@ namespace RiichiReign.UnityComponent
         public void InitializePlayer()
         {
             if (!IsServer)
-                throw new System.Exception("Calling server method in client machine");
+                throw new System.Exception(
+                    $"[{GetType().Name}] Calling server method in client machine"
+                );
 
             string json = JsonConvert.SerializeObject(PlayerList);
             InitializePlayerClientRPC(json);
@@ -101,7 +105,9 @@ namespace RiichiReign.UnityComponent
         public void SyncPlayerData()
         {
             if (!IsServer)
-                throw new System.Exception("Calling server method in client machine");
+                throw new System.Exception(
+                    $"[{GetType().Name}] Calling server method in client machine"
+                );
 
             string json = JsonConvert.SerializeObject(PlayerList);
             FixedString4096Bytes newValue = new(json);
@@ -129,11 +135,17 @@ namespace RiichiReign.UnityComponent
             );
 
             PlayerInstance localPlayer = playerList.Find(x =>
-                x.PlayerNetworkID == _localPlayerUI.NetworkID
+                x.PlayerNetworkID == _localPlayerUI.NetworkObjectId
             );
 
             _localPlayerUI.AssignPlayer(localPlayer, playerList.IndexOf(localPlayer) + 1);
             _localPlayerUI.AssignPlayerUIs(playerList);
+        }
+
+        [Rpc(SendTo.Server)]
+        public void SendPlayerDataServerRPC(ulong clientNetworkObjectId)
+        {
+            AddPlayer(clientNetworkObjectId);
         }
 
         #endregion

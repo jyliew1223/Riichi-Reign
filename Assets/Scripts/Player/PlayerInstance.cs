@@ -29,7 +29,6 @@ namespace RiichiReign.Player
         public PlayerHand Hand { get; private set; }
 
         List<PlayerAction> _availableActions = new();
-        PlayerAction _selectedAction = new(GameAction.None);
 
         #region Constructors
 
@@ -118,11 +117,7 @@ namespace RiichiReign.Player
 
         public override string ToString()
         {
-            StringBuilder stringBuilder = new();
-
-            stringBuilder.AppendLine($"Player{PlayerNetworkID}");
-
-            return stringBuilder.ToString();
+            return $"Player {PlayerNetworkID}";
         }
 
         public override bool Equals(object obj)

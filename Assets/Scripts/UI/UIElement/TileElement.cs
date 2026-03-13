@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using RiichiReign.GameComponent;
 using UnityEngine.UIElements;
 
@@ -5,7 +6,9 @@ namespace RiichiReign.UI
 {
     public class TileElement : VisualElement
     {
-        public Tile BoundTile { get; private set; }
+        public Tile BoundedTile { get; private set; }
+        public static System.Action<TileElement> OnTileClicked;
+        public static TileElement selectedTile;
 
         public TileElement()
         {
@@ -14,7 +17,7 @@ namespace RiichiReign.UI
 
         public void Bind(Tile tile)
         {
-            BoundTile = tile;
+            BoundedTile = tile;
 
             VisualElement tileBackground = new();
             VisualElement tileFace = new();
@@ -39,6 +42,51 @@ namespace RiichiReign.UI
 
             Add(tileBackground);
             Add(tileFace);
+
+            if (BoundedTile.Type == TileType.Invisible)
+                return;
+
+            RegisterCallback<ClickEvent>(evt =>
+            {
+                HandleOnClicked();
+            });
+            RegisterCallback<PointerEnterEvent>(evt =>
+            {
+                HandleOnPointerEnter();
+            });
+            RegisterCallback<PointerLeaveEvent>(evt =>
+            {
+                HandleOnPointerLeave();
+            });
+        }
+
+        private void HandleOnClicked()
+        {
+            if (ClassListContains("tile--up"))
+            {
+                OnTileClicked?.Invoke(this);
+                return;
+            }
+
+            if (selectedTile != this)
+            {
+                selectedTile?.RemoveFromClassList("tile--up");
+
+                selectedTile = this;
+                AddToClassList("tile--up");
+            }
+        }
+
+        private void HandleOnPointerEnter()
+        {
+            if (!ClassListContains("tile--up"))
+                AddToClassList("tile--up");
+        }
+
+        private void HandleOnPointerLeave()
+        {
+            if (ClassListContains("tile--up"))
+                RemoveFromClassList("tile--up");
         }
     }
 }

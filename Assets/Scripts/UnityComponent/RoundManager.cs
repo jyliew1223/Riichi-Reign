@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections;
+using System.Text;
 using RiichiReign.GameComponent;
 using RiichiReign.Player;
 using Unity.VisualScripting;
@@ -12,15 +10,17 @@ namespace RiichiReign.UnityComponent
     public enum TurnPhase
     {
         None,
-        StartTurn,
+        StartRound,
         DrawPhase,
         ActionPhase,
+        ChangePlayerPhase,
         EndTurn,
+        EndRound,
     }
 
-    internal class TurnManager : MonoBehaviour
+    internal class RoundManager : MonoBehaviour
     {
-        public static TurnManager Instance { get; private set; }
+        public static RoundManager Instance { get; private set; }
 
         Pool pool;
         TurnPhase _currentPhase = TurnPhase.None;
@@ -35,7 +35,7 @@ namespace RiichiReign.UnityComponent
         {
             if (Instance != null && Instance != this)
             {
-                Destroy(this.gameObject);
+                Destroy(gameObject);
             }
             else
             {
@@ -57,20 +57,20 @@ namespace RiichiReign.UnityComponent
 
         #region Turn Loop Logic
 
-        public PlayerInstance StartTurn()
+        public PlayerInstance StartRound()
         {
-            StartCoroutine(TurnLoopCoroutine());
+            StartCoroutine(TurnLoopRoutine());
             return null;
         }
 
-        IEnumerator TurnLoopCoroutine()
+        IEnumerator TurnLoopRoutine()
         {
-            _currentPhase = TurnPhase.StartTurn;
+            _currentPhase = TurnPhase.StartRound;
 
-            StartTurnCoroutine();
+            StartRoundRoutine();
             _currentPhase++;
 
-            while (_currentPhase != TurnPhase.EndTurn)
+            while (_currentPhase != TurnPhase.EndRound)
             {
                 _turnCount++;
 
@@ -84,25 +84,40 @@ namespace RiichiReign.UnityComponent
                 {
                     case TurnPhase.DrawPhase:
                         DrawPhase(_currentPlayer);
-                        goto case TurnPhase.ActionPhase;
+                        _currentPhase++;
+                        break;
                     case TurnPhase.ActionPhase:
-                        yield return StartCoroutine(ActionPhaseCoroutine(_currentPlayer));
+                        yield return StartCoroutine(
+                            ActionPhaseRoutine(
+                                _currentPlayer,
+                                (playerResponse) =>
+                                {
+                                    _currentPhase = ResolvePlayerResponse(
+                                        _currentPhase,
+                                        playerResponse
+                                    );
+                                }
+                            )
+                        );
+                        break;
+                    case TurnPhase.EndTurn:
+                        _currentPlayerIndex++;
+                        _currentPlayerIndex %= _playerCount;
+                        _currentPhase = TurnPhase.DrawPhase;
                         break;
                     default:
                         throw new UnexpectedEnumValueException<TurnPhase>(_currentPhase);
                 }
-
-                _currentPlayerIndex = _currentPlayerIndex++ % _playerCount;
             }
 
-            EndTurn();
+            EndRound();
         }
 
         #endregion
 
-        #region StartTurn Logics
+        #region StartRound Logics
 
-        void StartTurnCoroutine()
+        void StartRoundRoutine()
         {
             // Initialize and shuffle the pool
             InitPool();
@@ -166,34 +181,25 @@ namespace RiichiReign.UnityComponent
 
         #region ActionPhase Logic
 
-        IEnumerator ActionPhaseCoroutine(PlayerInstance player)
+        IEnumerator ActionPhaseRoutine(PlayerInstance player, System.Action<PlayerAction> callback)
         {
-            player.CheckAvailableAction();
-            yield return StartCoroutine(
-                ReactionManager.Instance.WaitForPlayerInputCoroutine(
-                    player,
-                    (callback) =>
-                    {
-                        switch (callback.Action)
-                        {
-                            case GameAction.Discard:
-                                Debug.Log(
-                                    $"[{GetType().Name}] Player choose to dicard tile: {callback.RelatedTile.ToString()}"
-                                );
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                )
-            );
+            ReactionManager.Server.PromptPlayerInput(player);
+
+            while (ReactionManager.Server.IsWaitingResponse.Value)
+            {
+                Debug.Log("RoundManager Coroutine");
+                yield return null;
+            }
+
+            callback?.Invoke(ReactionManager.Server.ReturnedResponse);
+            ReactionManager.Server.ResetResponse();
         }
 
         #endregion
 
-        #region EndTurn Logics
+        #region EndRound Logics
 
-        void EndTurn()
+        void EndRound()
         {
             _currentPhase = TurnPhase.None;
             Debug.Log($"[{GetType().Name}] Turn ended.");
@@ -204,6 +210,28 @@ namespace RiichiReign.UnityComponent
         #endregion
 
         #region Reslove Action Logics
+
+        private TurnPhase ResolvePlayerResponse(TurnPhase phase, PlayerAction response)
+        {
+            StringBuilder sb = new();
+
+            sb.AppendLine($"[{GetType().Name}] {_currentPlayer} Response: ");
+            sb.AppendLine();
+            sb.AppendLine(response.ToString());
+
+            Debug.Log(sb.ToString());
+
+            switch (phase)
+            {
+                case TurnPhase.ActionPhase:
+                    return TurnPhase.EndTurn;
+                default:
+                    break;
+            }
+
+            Debug.LogWarning("Flow to endround");
+            return TurnPhase.EndRound;
+        }
 
         #endregion
     }

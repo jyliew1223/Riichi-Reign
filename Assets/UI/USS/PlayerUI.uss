@@ -51,6 +51,13 @@
     min-height: auto;
     min-width: 10px;
     align-self: center;
+    transition-duration: 0.1s;
+}
+
+.tile--up {
+    flex-grow: 1;
+    translate: 0 -30%;
+    transition-duration: 0.1s;
 }
 
 .tile-background {
@@ -90,5 +97,3 @@
     position: absolute;
     bottom: 0;
 }
-
-

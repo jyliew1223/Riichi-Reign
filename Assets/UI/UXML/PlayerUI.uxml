@@ -211,7 +211,7 @@
         <ui:VisualElement name="PlayerContainer1" style="flex-grow: 1; align-items: auto; justify-content: space-between; flex-direction: row; position: absolute; width: auto; height: auto; margin-left: 5%; margin-right: 5%; margin-bottom: 1%; top: 0; right: 0; left: 0; bottom: 0; align-content: auto;">
             <ui:VisualElement name="Container" class="player-hand" style="height: 20%; justify-content: space-evenly; align-items: stretch; align-content: auto; align-self: auto; background-color: rgba(0, 0, 0, 0);">
                 <ui:VisualElement name="HandContainer" style="flex-grow: 0; flex-direction: row; align-items: stretch; justify-content: center; flex-shrink: 1; align-content: auto; align-self: stretch; width: 85%; margin-left: 10px; margin-right: 10px;">
-                    <ui:VisualElement class="tile" style="flex-grow: 1;">
+                    <ui:VisualElement class="tile tile--up">
                         <ui:VisualElement class="tile-background" style="flex-grow: 1;"/>
                         <ui:VisualElement class="tile-face" style="flex-grow: 1;"/>
                     </ui:VisualElement>

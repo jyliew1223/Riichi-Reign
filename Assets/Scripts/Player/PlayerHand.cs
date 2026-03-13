@@ -68,12 +68,6 @@ namespace RiichiReign.Player
 
         #endregion
 
-        #region Validation
-
-        public bool IsValidHand() => TotalTilesCount() == 13;
-
-        #endregion
-
         #region Querying
 
         public int TotalTilesCount() => TilesInHand.Count + Melds.Count * 3;
@@ -95,14 +89,9 @@ namespace RiichiReign.Player
 
         public List<PlayerAction> CheckAvailableAction(TurnPhase currentTurn = 0)
         {
-            if (!IsValidHand())
-            {
-                throw new InvalidHandException();
-            }
-
             List<PlayerAction> availableActions = new();
 
-            if (currentTurn == TurnPhase.StartTurn)
+            if (currentTurn == TurnPhase.StartRound)
             {
                 // Kyushukyuhai
                 int terminalCount = 0;

@@ -50,7 +50,7 @@ namespace RiichiReign.UnityComponent
         {
             // Initialize players
             InitPlayers();
-            PlayerInstance winner = TurnManager.Instance.StartTurn();
+            PlayerInstance winner = RoundManager.Instance.StartRound();
         }
 
         void InitPlayers()

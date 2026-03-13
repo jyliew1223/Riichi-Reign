@@ -1,12 +1,12 @@
+using System.Collections;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using RiichiReign.GameComponent;
 using RiichiReign.Player;
 using RiichiReign.UI;
 using RiichiReign.UnityComponent;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UIElements;
 
 namespace RiichiReign.UnityUIToolKitComponent
@@ -49,10 +49,12 @@ namespace RiichiReign.UnityUIToolKitComponent
     [RequireComponent(typeof(UIDocument))]
     public class PlayerUIController : NetworkBehaviour
     {
-        public ulong NetworkID => this.NetworkObjectId;
+        public ulong LocalNetworkObjectID => this.NetworkObjectId;
+
         int _localWindValue;
         PlayerInstance _localPlayer;
-        Dictionary<PlayerInstance, PlayerContainerElement> _PlayerContainerPairs = new();
+        Dictionary<PlayerInstance, PlayerContainerElement> _playerContainerPairs = new();
+        PlayerAction _selectedAction;
 
         #region Netcode Logics
 
@@ -70,6 +72,13 @@ namespace RiichiReign.UnityUIToolKitComponent
 
             // Initialize the local player instance and send it to the server
             Invoke(nameof(RegisterPlayer), 1f);
+
+            TileElement.OnTileClicked += HandleOnTileClick;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            TileElement.OnTileClicked -= HandleOnTileClick;
         }
 
         #endregion
@@ -97,7 +106,10 @@ namespace RiichiReign.UnityUIToolKitComponent
                 return;
 
             if (_localPlayer == null)
+            {
+                Debug.LogWarning($"[{GetType().Name}] _localPlayer is null", this);
                 return;
+            }
 
             var root = GetComponent<UIDocument>().rootVisualElement;
 
@@ -132,7 +144,7 @@ namespace RiichiReign.UnityUIToolKitComponent
                 }
 
                 // Map the player to their UI containers
-                _PlayerContainerPairs.Add(playerList[i], containerElement);
+                _playerContainerPairs.Add(playerList[i], containerElement);
             }
         }
 
@@ -147,7 +159,7 @@ namespace RiichiReign.UnityUIToolKitComponent
             foreach (var player in playerList)
             {
                 // Verify the player has a UI container assigned
-                if (!_PlayerContainerPairs.ContainsKey(player))
+                if (!_playerContainerPairs.ContainsKey(player))
                 {
                     Debug.LogWarning(
                         $"[{GetType().Name}] Player {player} doesnt stored locally",
@@ -157,7 +169,7 @@ namespace RiichiReign.UnityUIToolKitComponent
                 }
 
                 // Clear previous tile displays
-                _PlayerContainerPairs[player].Clear();
+                _playerContainerPairs[player].Clear();
 
                 // Display tiles from the player's hand
                 foreach (Tile tile in player.Hand.TilesInHand)
@@ -165,7 +177,7 @@ namespace RiichiReign.UnityUIToolKitComponent
                     TileElement tileElement = new();
                     // Show actual tile data only for the local player; show hidden tiles for others
                     tileElement.Bind((player == _localPlayer ? tile : new Tile()));
-                    _PlayerContainerPairs[player].HandContainer.Add(tileElement);
+                    _playerContainerPairs[player].HandContainer.Add(tileElement);
                 }
 
                 // Display the temporarily drawn tile if one exists
@@ -174,7 +186,7 @@ namespace RiichiReign.UnityUIToolKitComponent
                     TileElement tileElement = new();
                     // Show actual tile data only for the local player; show hidden tile for others
                     tileElement.Bind((player == _localPlayer ? tempTile : new Tile()));
-                    _PlayerContainerPairs[player].TempTileContainer.Add(tileElement);
+                    _playerContainerPairs[player].TempTileContainer.Add(tileElement);
                 }
             }
         }
@@ -224,37 +236,61 @@ namespace RiichiReign.UnityUIToolKitComponent
 
                 // Create a placeholder entry to track containers for clearing later
                 PlayerContainerElement containerElement = new(handContainer, tempTileContainer);
+                containerElement.Clear();
             }
         }
-
-        #endregion
-
-        #endregion
-
-        #region Remote Procedure Calls (RPC)
 
         private void RegisterPlayer()
         {
             PlayerManager.Local.RegisterPlayerUI(this);
+            ReactionManager.Local.RegisterPlayerUI(this);
 
             Debug.Log(
-                $"[{GetType().Name}] Sending player network id to Server: {this.NetworkObjectId}"
+                $"[{GetType().Name}] Sending player network id to Server: {LocalNetworkObjectID}"
             );
 
-            SendPlayerDataServerRPC(NetworkID);
+            PlayerManager.Local.SendPlayerDataServerRPC(LocalNetworkObjectID);
         }
 
-        [Rpc(SendTo.Server)]
-        private void SendPlayerDataServerRPC(ulong clientNetworkId)
+        #endregion
+
+        #region Player Actions Methods
+
+        private bool _isTileClickable = false;
+
+        public IEnumerator PrompForPlayerInputRoutine(System.Action<PlayerAction> selectedAction)
         {
-            if (!PlayerManager.Server.IsReady)
-                Debug.LogError(
-                    $"[{GetType().Name}] Getting PlayerInstance while it's not Ready",
-                    this
-                );
+            _selectedAction = null;
 
-            PlayerManager.Server.AddPlayer(clientNetworkId);
+            List<PlayerAction> availableAction = _localPlayer.Hand.CheckAvailableAction();
+
+            _isTileClickable = availableAction.Exists(x => x.Action == GameAction.Discard);
+
+            while (_selectedAction == null && ReactionManager.Local.IsWaitingResponse.Value)
+            {
+                yield return null;
+            }
+
+            selectedAction?.Invoke(_selectedAction);
+
+            _isTileClickable = false;
+            _selectedAction = null;
         }
+
+        private
+        #endregion
+
+        #region Event Listener
+
+        void HandleOnTileClick(TileElement tileElement)
+        {
+            if (!_isTileClickable && _selectedAction != null)
+                return;
+
+            _selectedAction = new(GameAction.Discard, tileElement.BoundedTile);
+        }
+
+        #endregion
 
         #endregion
     }
