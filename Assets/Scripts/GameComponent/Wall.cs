@@ -4,13 +4,13 @@ using System.Linq;
 
 namespace RiichiReign.GameComponent
 {
-    public class Pool
+    public class Wall
     {
         Stack<Tile> _tiles;
 
         #region Constructors
 
-        public Pool()
+        public Wall()
         {
             _tiles = new Stack<Tile>();
         }
@@ -19,7 +19,7 @@ namespace RiichiReign.GameComponent
 
         #region Public Methods
 
-        public void InitializePool()
+        public void Initialize()
         {
             // Clear the pool before initializing
             _tiles.Clear();
@@ -45,8 +45,25 @@ namespace RiichiReign.GameComponent
 
         public void Shuffle()
         {
+#if UNITY_EDITOR
+            var rnd = new Random(1234);
+
+            List<Tile> list = new List<Tile>(_tiles);
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rnd.Next(n + 1);
+                Tile value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+
+            _tiles = new Stack<Tile>(list);
+#else
             var rnd = new Random();
             _tiles = new Stack<Tile>(_tiles.OrderBy(x => rnd.Next()));
+#endif
         }
 
         public Tile DrawTile()

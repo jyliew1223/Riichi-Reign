@@ -1,189 +1,101 @@
-﻿using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using Newtonsoft.Json;
-using RiichiReign.Player;
+using RiichiReign.GamePlayer;
 using RiichiReign.UnityUIToolKitComponent;
-using Unity.Collections;
 using Unity.Netcode;
-using Unity.VisualScripting;
+using Unity.Services.Relay.Http;
 using UnityEngine;
 
 namespace RiichiReign.UnityComponent
 {
-    internal class PlayerManager : NetworkBehaviour
+    public class PlayerManager : NetworkBehaviour
     {
-        public bool IsReady { get; private set; } = false;
+        public static PlayerManager Instance;
 
-        public List<PlayerInstance> PlayerList { get; private set; } = new();
-        public NetworkVariable<FixedString4096Bytes> PlayerListJson = new();
-
-        private static PlayerManager _instance;
-        private PlayerUIController _localPlayerUI;
-
-        #region Netcode Logics
+        Player _localPlayer;
+        PlayerUIController _playerUI;
 
         public override void OnNetworkSpawn()
         {
-            if (_instance != null)
+            if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
                 return;
             }
 
-            _instance = this;
-
-            IsReady = true;
-            PlayerListJson.OnValueChanged += HandleOnValueChanged;
-
-            StringBuilder stringBuilder = new();
-            stringBuilder.AppendLine($"[{GetType().Name}] Network spawned:");
-            stringBuilder.AppendLine("IsServer: " + IsServer);
-            stringBuilder.AppendLine("IsLocalPlayer: " + IsLocalPlayer);
-            stringBuilder.AppendLine("IsHost: " + IsHost);
-            stringBuilder.AppendLine("IsClient: " + IsClient);
-
-            Debug.Log(stringBuilder.ToString());
+            Debug.Log($"[{GetType().Name}] Setting Singleton.....");
+            Instance = this;
         }
-
-        public static PlayerManager Server =>
-            _instance.IsServer
-                ? _instance
-                : throw new System.Exception(
-                    $"[{_instance.GetType().Name}] Local instance is not server instance"
-                );
-        public static PlayerManager Local =>
-            _instance.IsClient
-                ? _instance
-                : throw new System.Exception(
-                    $"[{_instance.GetType().Name}] Local instance is not client instance"
-                );
 
         public override void OnNetworkDespawn()
         {
-            PlayerListJson.OnValueChanged -= HandleOnValueChanged;
-
-            if (_instance == this)
+            if (Instance == this)
             {
-                _instance = null;
+                Instance = null;
             }
         }
 
-        #endregion
-
-        #region  Methods
-
-        public void RegisterPlayerUI(PlayerUIController playerUI)
+        public void RegisterPlayer(ulong networkID, PlayerUIController playerUI)
         {
-            _localPlayerUI = playerUI;
-            Debug.Log($"[{GetType().Name}] _localPlayerUI assigned", _localPlayerUI.gameObject);
-        }
-
-        public void AddPlayer(ulong networkID)
-        {
-            if (!IsServer)
-                throw new System.Exception(
-                    $"[{GetType().Name}] Calling server method in client machine"
-                );
-
-            PlayerInstance player = new(networkID);
-            PlayerList.Add(player);
-            Debug.Log($"[(Server) {GetType().Name}] Player Added: {player}");
-        }
-
-        public void InitializePlayer()
-        {
-            if (!IsServer)
-                throw new System.Exception(
-                    $"[{GetType().Name}] Calling server method in client machine"
-                );
-
-            string json = JsonConvert.SerializeObject(PlayerList);
-            InitializePlayerClientRPC(json);
-            Debug.Log($"[(Server) {GetType().Name}] Initializing players");
-        }
-
-        public void SyncPlayerData()
-        {
-            if (!IsServer)
-                throw new System.Exception(
-                    $"[{GetType().Name}] Calling server method in client machine"
-                );
-
-            string json = JsonConvert.SerializeObject(PlayerList);
-            FixedString4096Bytes newValue = new(json);
-            if (PlayerListJson.Value != newValue)
-            {
-                PlayerListJson.Value = newValue;
-            }
-            Debug.Log(
-                $"[{GetType().Name}] Syncing player data via NetworkVariable: " + json.Prettify()
-            );
-        }
-
-        #endregion
-
-        #region RPCs
-
-        [Rpc(SendTo.ClientsAndHost)]
-        private void InitializePlayerClientRPC(string json)
-        {
-            if (_localPlayerUI == null)
-                Debug.LogWarning($"[{GetType().Name}] _localPlayerUI not assgin!");
-
-            List<PlayerInstance> playerList = JsonConvert.DeserializeObject<List<PlayerInstance>>(
-                json
-            );
-
-            PlayerInstance localPlayer = playerList.Find(x =>
-                x.PlayerNetworkID == _localPlayerUI.NetworkObjectId
-            );
-
-            _localPlayerUI.AssignPlayer(localPlayer, playerList.IndexOf(localPlayer) + 1);
-            _localPlayerUI.AssignPlayerUIs(playerList);
+            _playerUI = playerUI;
+            Debug.Log($"[{GetType().Name}][Client] Sending ID {networkID} to server...");
+            RegisterPlayerServerRpc(networkID);
         }
 
         [Rpc(SendTo.Server)]
-        public void SendPlayerDataServerRPC(ulong clientNetworkObjectId)
+        public void RegisterPlayerServerRpc(ulong networkID, RpcParams rpcParams = default)
         {
-            AddPlayer(clientNetworkObjectId);
+            Debug.Log(
+                $"[{GetType().Name}][Server] Player {networkID} Received. Creating new player."
+            );
+
+            Player newPlayer = GameManager.Instance.AddPlayer(networkID);
+            string json = JsonConvert.SerializeObject(newPlayer);
+
+            StringBuilder sb = new();
+            sb.AppendLine(
+                $"[{GetType().Name}][Server] Player {networkID} created. Sending back to client."
+            );
+            sb.AppendLine();
+            sb.AppendLine($"JSON: {json}");
+
+            Debug.Log(sb.ToString());
+
+            var targetParams = new RpcParams
+            {
+                Send = new RpcSendParams
+                {
+                    Target = RpcTarget.Single(rpcParams.Receive.SenderClientId, RpcTargetUse.Temp),
+                },
+            };
+
+            ConfirmRegistrationRpc(json, targetParams);
         }
 
-        #endregion
-
-        #region Network value changes callbacks
-
-        private void HandleOnValueChanged(
-            FixedString4096Bytes oldValue,
-            FixedString4096Bytes newValue
-        )
+        [Rpc(SendTo.SpecifiedInParams)]
+        public void ConfirmRegistrationRpc(string json, RpcParams rpcParams = default)
         {
-            if (_localPlayerUI == null)
+            _localPlayer = JsonConvert.DeserializeObject<Player>(json);
+
+            if (_localPlayer != null)
+            {
+                StringBuilder sb = new();
+                sb.AppendLine(
+                    $"[{GetType().Name}][Client] Successfully registered and received Player object!"
+                );
+                sb.AppendLine();
+                sb.AppendLine($"Player: {_localPlayer}");
+
+                Debug.Log(sb.ToString());
+            }
+            else
             {
                 Debug.LogWarning(
-                    $"[{GetType().Name}] _localPlayerUI is null when Handling OnValueChange"
+                    $"[{GetType().Name}][Client] Received JSON but _localPlayer is still null!"
                 );
-                return;
-            }
-
-            if (string.IsNullOrEmpty(newValue.ToString()))
-            {
-                return;
-            }
-
-            try
-            {
-                List<PlayerInstance> playerList = JsonConvert.DeserializeObject<
-                    List<PlayerInstance>
-                >(newValue.ToString());
-
-                _localPlayerUI.UpdatePlayerHandUI(playerList);
-            }
-            catch (JsonException ex)
-            {
-                Debug.LogError($"Failed to deserialize player list in UI: {ex.Message}");
+                ;
             }
         }
-
-        #endregion
     }
 }

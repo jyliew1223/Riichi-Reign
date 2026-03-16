@@ -4,7 +4,7 @@ using System.Text;
 using Newtonsoft.Json;
 using RiichiReign.GameComponent;
 
-namespace RiichiReign.Player
+namespace RiichiReign.GamePlayer
 {
     [System.Serializable]
     public enum GameAction

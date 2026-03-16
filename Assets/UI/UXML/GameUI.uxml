@@ -1,5 +1,8 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement style="flex-grow: 1; align-items: stretch; justify-content: center; align-self: auto; padding-top: 100px; padding-right: 100px; padding-bottom: 100px; padding-left: 100px;">
+    <ui:VisualElement name="GameContainer" style="flex-grow: 1; align-items: stretch; justify-content: center; align-self: auto; padding-top: 100px; padding-right: 100px; padding-bottom: 100px; padding-left: 100px; position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: none; visibility: visible;">
+        <ui:Button text="Start Game" name="StartGameBtn" style="flex-grow: 1; font-size: 100%; align-items: center; justify-content: center; align-self: auto; align-content: auto; flex-shrink: 1; visibility: visible;"/>
+    </ui:VisualElement>
+    <ui:VisualElement name="NetworkContainer" style="flex-grow: 1; align-items: stretch; justify-content: center; align-self: auto; padding-top: 100px; padding-right: 100px; padding-bottom: 100px; padding-left: 100px; position: absolute; top: 0; right: 0; bottom: 0; left: 0; visibility: visible; display: flex;">
         <ui:Button text="Start Host" name="StartHostBtn" style="flex-grow: 1; font-size: 100%;"/>
         <ui:Button text="Join as Client" name="StartClientBtn" style="flex-grow: 1; font-size: 100%;"/>
     </ui:VisualElement>

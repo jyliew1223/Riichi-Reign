@@ -9,7 +9,7 @@ using RiichiReign.GameComponent;
 using RiichiReign.UnityComponent;
 using UnityEngine;
 
-namespace RiichiReign.Player
+namespace RiichiReign.GamePlayer
 {
     public class InvalidHandException : Exception { }
 
@@ -43,123 +43,10 @@ namespace RiichiReign.Player
 
         #endregion
 
-        #region Methods
-
-        #region Tile Management
-        public void AddTile(Tile tile) => TilesInHand.Add(tile);
-
-        public void RemoveTile(Tile tile)
+        public void AddTile(Tile tile)
         {
-            if (!TilesInHand.Remove(tile))
-            {
-                throw new System.ArgumentException(
-                    "The specified tile is not in the player's hand."
-                );
-            }
+            TilesInHand.Add(tile);
         }
-
-        public void DrawTile(Pool pool) => TempTile = pool.DrawTile();
-
-        #endregion
-
-        #region Meld Management
-
-        public void AddMeld(IMeldType meld) => Melds.Add(meld);
-
-        #endregion
-
-        #region Querying
-
-        public int TotalTilesCount() => TilesInHand.Count + Melds.Count * 3;
-
-        public bool CheckTempTile(out Tile tile)
-        {
-            tile = null;
-
-            if (TempTile == null)
-                return false;
-
-            tile = TempTile;
-            return true;
-        }
-
-        #endregion
-
-        #region PlayerAction Checks
-
-        public List<PlayerAction> CheckAvailableAction(TurnPhase currentTurn = 0)
-        {
-            List<PlayerAction> availableActions = new();
-
-            if (currentTurn == TurnPhase.StartRound)
-            {
-                // Kyushukyuhai
-                int terminalCount = 0;
-
-                foreach (Tile tile in TilesInHand)
-                {
-                    if (tile.IsTerminal())
-                    {
-                        terminalCount++;
-                    }
-                }
-
-                if (terminalCount >= 9)
-                {
-                    availableActions.Add(new(GameAction.Kyushukyuhai));
-                    availableActions.Add(new(GameAction.Skip));
-                }
-
-                // Terminate immediately if user can declare Kyushukyuhai
-                return availableActions;
-            }
-
-            availableActions.Add(new(GameAction.Discard));
-
-            return availableActions;
-        }
-
-        private bool CheckRon(List<Tile> hand)
-        {
-            if (hand.Count != 14)
-            {
-                Debug.Log(
-                    $"[{GetType().Name}] Cannot Declare Ron without 14 tiles in hand, current hand: \n{hand}"
-                );
-            }
-
-            // Group by your Equals logic
-            var groups = hand.GroupBy(t => t);
-
-            foreach (var group in groups)
-            {
-                int count = group.Count();
-                Tile tileType = group.Key;
-
-                // remove pair for every possible combination and check is it possible to declare Ron
-                if (count >= 2)
-                {
-                    List<Tile> tilesLeft = hand.ToList();
-                    tilesLeft.Remove(tileType);
-                    tilesLeft.Remove(tileType);
-                    return CheckRonRecursive(tilesLeft);
-                }
-            }
-
-            return false;
-        }
-
-        private bool CheckRonRecursive(List<Tile> tilesLeft)
-        {
-            if (tilesLeft == null || tilesLeft.Count == 0)
-                return true;
-
-            return false;
-        }
-
-        #endregion
-
-        #endregion
 
         #region Overrides
 
