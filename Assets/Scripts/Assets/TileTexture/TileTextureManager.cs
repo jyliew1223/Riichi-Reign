@@ -1,5 +1,5 @@
 ﻿using RiichiReign.GameAsset;
-using RiichiReign.GameComponent;
+using RiichiReign.MahjongEngine;
 using UnityEngine;
 
 namespace RiichiReign.UI
@@ -27,9 +27,8 @@ namespace RiichiReign.UI
             TileTextureAsset.Initialize();
         }
 
-        public Texture2D GetTileBackground(Tile tile)
+        public Texture2D GetTileBackground()
         {
-            string key = tile.GetTextureKey();
             Texture2D texture = TileTextureAsset.GetBackground();
             return texture;
         }
@@ -38,6 +37,12 @@ namespace RiichiReign.UI
         {
             string key = tile.GetTextureKey();
             Texture2D texture = TileTextureAsset.GetFront(key);
+            return texture;
+        }
+
+        public Texture2D GetFlipped()
+        {
+            Texture2D texture = TileTextureAsset.GetFront("Back");
             return texture;
         }
     }

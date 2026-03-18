@@ -1,5 +1,4 @@
-using System.Diagnostics;
-using RiichiReign.GameComponent;
+using RiichiReign.MahjongEngine;
 using UnityEngine.UIElements;
 
 namespace RiichiReign.UI
@@ -13,10 +12,19 @@ namespace RiichiReign.UI
         public TileElement()
         {
             AddToClassList("tile");
+            BindFliped();
+        }
+
+        public TileElement(Tile tile)
+        {
+            AddToClassList("tile");
+            Bind(tile);
         }
 
         public void Bind(Tile tile)
         {
+            Clear();
+
             BoundedTile = tile;
 
             VisualElement tileBackground = new();
@@ -26,25 +34,14 @@ namespace RiichiReign.UI
             tileFace.AddToClassList("tile-face");
 
             tileBackground.style.backgroundImage = new StyleBackground(
-                TileTextureManager.Instance.GetTileBackground(tile)
+                TileTextureManager.Instance.GetTileBackground()
             );
             tileFace.style.backgroundImage = new StyleBackground(
                 TileTextureManager.Instance.GetTileFront(tile)
             );
 
-            if (tile.Type == TileType.Invisible)
-            {
-                tileFace.style.backgroundSize = new BackgroundSize(
-                    new Length(100, LengthUnit.Percent),
-                    new Length(100, LengthUnit.Percent)
-                );
-            }
-
             Add(tileBackground);
             Add(tileFace);
-
-            if (BoundedTile.Type == TileType.Invisible)
-                return;
 
             RegisterCallback<ClickEvent>(evt =>
             {
@@ -58,6 +55,32 @@ namespace RiichiReign.UI
             {
                 HandleOnPointerLeave();
             });
+        }
+
+        public void BindFliped()
+        {
+            Clear();
+
+            VisualElement tileBackground = new();
+            VisualElement tileFace = new();
+
+            tileBackground.AddToClassList("tile-background");
+            tileFace.AddToClassList("tile-face");
+
+            tileBackground.style.backgroundImage = new StyleBackground(
+                TileTextureManager.Instance.GetTileBackground()
+            );
+            tileFace.style.backgroundImage = new StyleBackground(
+                TileTextureManager.Instance.GetFlipped()
+            );
+
+            tileFace.style.backgroundSize = new BackgroundSize(
+                new Length(100, LengthUnit.Percent),
+                new Length(100, LengthUnit.Percent)
+            );
+
+            Add(tileBackground);
+            Add(tileFace);
         }
 
         private void HandleOnClicked()

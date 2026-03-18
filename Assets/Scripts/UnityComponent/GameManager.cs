@@ -1,16 +1,16 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
-using RiichiReign.GameComponent;
-using RiichiReign.GamePlayer;
-using UnityEditor.Rendering;
+using System.Text;
+using NUnit.Framework.Constraints;
+using RiichiReign.MahjongEngine;
+using RiichiReiign.UnityComponent;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 namespace RiichiReign.UnityComponent
 {
     public class GameManager : MonoBehaviour
     {
-        private static WaitForSeconds _waitForSeconds_5 = new WaitForSeconds(.5f);
-
         [SerializeField]
         int _playerCount = 3;
 
@@ -38,13 +38,14 @@ namespace RiichiReign.UnityComponent
             }
         }
 
-        public Player AddPlayer(ulong NetworkID)
+        public Player AddPlayer(string playerID)
         {
             if (_playerList.Count >= _playerCount)
                 throw new System.Exception("Player Count Exceed!");
 
-            Debug.Log($"[{GetType().Name}] Adding Player with ID {NetworkID}");
-            Player player = new(NetworkID);
+            Debug.Log($"[{GetType().Name}] Adding Player with ID {playerID}");
+
+            Player player = new(playerID);
             _playerList.Add(player);
 
             return player;
@@ -52,55 +53,40 @@ namespace RiichiReign.UnityComponent
 
         public void StartGame()
         {
-            if (_playerList.Count < 3)
-                throw new System.Exception(
-                    $"Not enough players to start a game, current player count: {_playerList.Count}"
-                );
-
-            Debug.Log($"Starting Game with player count: {_playerList.Count}");
-
-            Debug.Log($"[{GetType().Name}] Initializing Player...");
-
-            int windValue = 1;
-            foreach (var player in _playerList)
-            {
-                player.SetWindValue(windValue++);
-                player.SetPoint(25000);
-            }
-
-            StartCoroutine(GameRoutine());
+            GameEngine game = new(
+                _playerList,
+                _playerCount,
+                HandleOnGameStart,
+                HandleOnPlayerDataChanged,
+                HandleOnPlayerHandChanged,
+                Debug.Log
+            );
+            game.StartGame();
         }
 
-        public IEnumerator GameRoutine()
+        public void HandleOnGameStart(List<Player> playerList)
         {
-            // Turn Loop to be Implement
-            {
-                // Reset Player Hand
-                foreach (var player in _playerList)
-                {
-                    player.ResetHand();
-                }
+            Debug.Log($"[{GetType().Name}] Resolving OnGameStart...");
 
-                yield return TurnRoutine();
-            }
+            ServerManager.Instance.InitializeClientGame(playerList);
         }
 
-        public IEnumerator TurnRoutine()
+        public void HandleOnPlayerDataChanged(Player player)
         {
-            Wall wall = new();
-            wall.Initialize();
-            wall.Shuffle();
+            throw new NotImplementedException();
+        }
 
-            // Deal Initial Hand
-            for (int i = 0; i < 13; i++)
-            {
-                foreach (var player in _playerList)
-                {
-                    Debug.Log($"[{GetType().Name}] {player} drawing initial tile from wall");
-                    player.DrawTile(wall);
-                    yield return _waitForSeconds_5;
-                }
-            }
+        public void HandleOnPlayerHandChanged(Player player)
+        {
+            StringBuilder sb = new();
+
+            sb.AppendLine($"[{GetType().Name}] Resolving OnPlayerHandChanged...");
+            sb.AppendLine($"Player ID: {player.PlayerID}");
+            sb.AppendLine($"New hand: {player.Hand}");
+
+            Debug.Log(sb.ToString());
+
+            ServerManager.Instance.SyncPlayerHand(player);
         }
     }
 }

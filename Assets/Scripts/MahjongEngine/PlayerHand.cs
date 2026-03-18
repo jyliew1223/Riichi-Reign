@@ -1,19 +1,44 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
 using Newtonsoft.Json;
-using RiichiReign.GameComponent;
-using RiichiReign.UnityComponent;
-using UnityEngine;
+using UnityEditor.Rendering;
 
-namespace RiichiReign.GamePlayer
+namespace RiichiReign.MahjongEngine
 {
-    public class InvalidHandException : Exception { }
+    [Serializable]
+    public abstract class Hand { }
 
-    public class PlayerHand
+    [Serializable]
+    public class OpponentHand : Hand
+    {
+        [JsonProperty("playerID")]
+        public string PlayerID;
+
+        [JsonProperty("tileCount")]
+        public int TileCount;
+
+        [JsonProperty("hasTempTile")]
+        public bool HasTempTile;
+
+        public OpponentHand(string playerID, PlayerHand hand)
+        {
+            PlayerID = playerID;
+            TileCount = hand.TilesInHand.Count;
+            HasTempTile = hand.TempTile != null;
+        }
+
+        [JsonConstructor]
+        private OpponentHand(string playerID, int tileCount, bool hasTempTile)
+        {
+            PlayerID = playerID;
+            TileCount = tileCount;
+            HasTempTile = hasTempTile;
+        }
+    }
+
+    [Serializable]
+    public class PlayerHand : Hand
     {
         [JsonProperty("tempTile")]
         public Tile TempTile { get; private set; }
@@ -34,7 +59,7 @@ namespace RiichiReign.GamePlayer
         }
 
         [JsonConstructor]
-        public PlayerHand(Tile tempTile, List<Tile> tileInHand, List<IMeldType> melds)
+        private PlayerHand(Tile tempTile, List<Tile> tileInHand, List<IMeldType> melds)
         {
             TempTile = tempTile;
             TilesInHand = tileInHand ?? new List<Tile>();
@@ -46,6 +71,11 @@ namespace RiichiReign.GamePlayer
         public void AddTile(Tile tile)
         {
             TilesInHand.Add(tile);
+        }
+
+        public void DrawTile(Tile tile)
+        {
+            TempTile = tile;
         }
 
         #region Overrides

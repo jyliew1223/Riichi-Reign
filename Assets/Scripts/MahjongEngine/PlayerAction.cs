@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 using Newtonsoft.Json;
-using RiichiReign.GameComponent;
 
-namespace RiichiReign.GamePlayer
+namespace RiichiReign.MahjongEngine
 {
     [System.Serializable]
     public enum GameAction

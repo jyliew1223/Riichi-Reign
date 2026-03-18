@@ -1,22 +1,36 @@
-using System.Text;
-using System.Threading;
-using Newtonsoft.Json;
-using RiichiReign.GamePlayer;
+using System.Collections.Generic;
+using RiichiReign.MahjongEngine;
 using RiichiReign.UnityUIToolKitComponent;
-using Unity.Netcode;
-using Unity.Services.Relay.Http;
+using RiichiReiign.UnityComponent;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace RiichiReign.UnityComponent
 {
-    public class PlayerManager : NetworkBehaviour
+    public class PlayerData
+    {
+        public int Points;
+
+        public int WindValue;
+
+        public PlayerData(int points, int windValue)
+        {
+            Points = points;
+            WindValue = windValue;
+        }
+    }
+
+    public class PlayerManager : MonoBehaviour
     {
         public static PlayerManager Instance;
 
-        Player _localPlayer;
+        public string LocalPlayerID { get; private set; }
+        public PlayerData LocalPLayerData => StoredPlayerIDDataPair[LocalPlayerID];
+
+        public Dictionary<string, PlayerData> StoredPlayerIDDataPair = new();
         PlayerUIController _playerUI;
 
-        public override void OnNetworkSpawn()
+        void Awake()
         {
             if (Instance != null && Instance != this)
             {
@@ -28,7 +42,7 @@ namespace RiichiReign.UnityComponent
             Instance = this;
         }
 
-        public override void OnNetworkDespawn()
+        void OnDestroy()
         {
             if (Instance == this)
             {
@@ -36,66 +50,64 @@ namespace RiichiReign.UnityComponent
             }
         }
 
-        public void RegisterPlayer(ulong networkID, PlayerUIController playerUI)
+        public void RegisterPlayer(PlayerUIController playerUI)
         {
             _playerUI = playerUI;
-            Debug.Log($"[{GetType().Name}][Client] Sending ID {networkID} to server...");
-            RegisterPlayerServerRpc(networkID);
+            Debug.Log($"[{GetType().Name}] Sending ID to server...");
+            ServerManager.Instance.RegisterPlayerServerRpc();
         }
 
-        [Rpc(SendTo.Server)]
-        public void RegisterPlayerServerRpc(ulong networkID, RpcParams rpcParams = default)
+        public void SetLocalPlayer(Player player)
         {
-            Debug.Log(
-                $"[{GetType().Name}][Server] Player {networkID} Received. Creating new player."
-            );
-
-            Player newPlayer = GameManager.Instance.AddPlayer(networkID);
-            string json = JsonConvert.SerializeObject(newPlayer);
-
-            StringBuilder sb = new();
-            sb.AppendLine(
-                $"[{GetType().Name}][Server] Player {networkID} created. Sending back to client."
-            );
-            sb.AppendLine();
-            sb.AppendLine($"JSON: {json}");
-
-            Debug.Log(sb.ToString());
-
-            var targetParams = new RpcParams
-            {
-                Send = new RpcSendParams
-                {
-                    Target = RpcTarget.Single(rpcParams.Receive.SenderClientId, RpcTargetUse.Temp),
-                },
-            };
-
-            ConfirmRegistrationRpc(json, targetParams);
+            Debug.Log($"[{GetType().Name}] Setting LocalPlayer: {player}");
+            LocalPlayerID = player.PlayerID;
         }
 
-        [Rpc(SendTo.SpecifiedInParams)]
-        public void ConfirmRegistrationRpc(string json, RpcParams rpcParams = default)
+        public void SetPlayerData(
+            string playerID,
+            int points,
+            int windValue,
+            bool isAddingEnabled = true
+        )
         {
-            _localPlayer = JsonConvert.DeserializeObject<Player>(json);
-
-            if (_localPlayer != null)
+            if (!StoredPlayerIDDataPair.ContainsKey(playerID) && !isAddingEnabled)
             {
-                StringBuilder sb = new();
-                sb.AppendLine(
-                    $"[{GetType().Name}][Client] Successfully registered and received Player object!"
-                );
-                sb.AppendLine();
-                sb.AppendLine($"Player: {_localPlayer}");
-
-                Debug.Log(sb.ToString());
+                throw new System.Exception($"[{GetType().Name}] Player{playerID} doesn't exists!");
+            }
+            else if (!StoredPlayerIDDataPair.ContainsKey(playerID))
+            {
+                Debug.Log($"[{GetType().Name}] Adding Player Data: {playerID}");
+                PlayerData data = new(points, windValue);
+                StoredPlayerIDDataPair[playerID] = data;
             }
             else
             {
-                Debug.LogWarning(
-                    $"[{GetType().Name}][Client] Received JSON but _localPlayer is still null!"
-                );
-                ;
+                Debug.Log($"[{GetType().Name}] Syncing Player Data: {playerID}");
+                StoredPlayerIDDataPair[playerID].Points = points;
+                StoredPlayerIDDataPair[playerID].WindValue = windValue;
             }
+        }
+
+        public void InitializeLPlayerUI()
+        {
+            _playerUI.InitializeGameView();
+        }
+
+        public void SyncLocalPlayerHand(PlayerHand newHand)
+        {
+            _playerUI.UpdateLocalPlayerHand(newHand);
+        }
+
+        public void SyncOpponentPlayerHand(OpponentHand opponentHand)
+        {
+            if (opponentHand.PlayerID == LocalPlayerID)
+            {
+                Debug.LogWarning(
+                    $"[{GetType().Name}] Receive INVISIBLE hand for LocalPlayer instead!"
+                );
+            }
+
+            _playerUI.UpdateOpponentPlayerHand(opponentHand);
         }
     }
 }

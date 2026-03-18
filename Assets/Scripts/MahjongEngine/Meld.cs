@@ -1,4 +1,4 @@
-namespace RiichiReign.GameComponent
+namespace RiichiReign.MahjongEngine
 {
     [System.Serializable]
     public abstract class IMeldType { }

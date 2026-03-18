@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace RiichiReign.GameComponent
+namespace RiichiReign.MahjongEngine
 {
     public class Wall
     {

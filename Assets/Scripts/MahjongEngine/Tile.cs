@@ -1,11 +1,10 @@
 using System;
 using Newtonsoft.Json;
 
-namespace RiichiReign.GameComponent
+namespace RiichiReign.MahjongEngine
 {
     public enum TileType
     {
-        Invisible,
         Manzu,
         Pinzu,
         Souzu,
@@ -25,13 +24,6 @@ namespace RiichiReign.GameComponent
         public bool IsRedDora { get; protected set; }
 
         #region Constructor
-
-        public Tile()
-        {
-            Type = TileType.Invisible;
-            Value = -1;
-            IsRedDora = false;
-        }
 
         [JsonConstructor]
         private Tile(int value, TileType type, bool isRedDora)
@@ -68,9 +60,6 @@ namespace RiichiReign.GameComponent
 
             switch (Type)
             {
-                case TileType.Invisible:
-                    key = "Back";
-                    break;
                 case TileType.Manzu:
                     key = $"Man{Value}";
                     if (IsRedDora)
