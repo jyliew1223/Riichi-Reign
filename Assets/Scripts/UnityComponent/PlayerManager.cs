@@ -1,34 +1,17 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using RiichiReign.MahjongEngine;
 using RiichiReign.UnityUIToolKitComponent;
-using RiichiReiign.UnityComponent;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace RiichiReign.UnityComponent
 {
-    public class PlayerData
-    {
-        public int Points;
-
-        public int WindValue;
-
-        public PlayerData(int points, int windValue)
-        {
-            Points = points;
-            WindValue = windValue;
-        }
-    }
-
     public class PlayerManager : MonoBehaviour
     {
         public static PlayerManager Instance;
-
-        public string LocalPlayerID { get; private set; }
-        public PlayerData LocalPLayerData => StoredPlayerIDDataPair[LocalPlayerID];
-
-        public Dictionary<string, PlayerData> StoredPlayerIDDataPair = new();
-        PlayerUIController _playerUI;
+        public Dictionary<string, PlayerBehaviour> PlayerIDBehaviorPair { get; private set; } =
+            new();
 
         void Awake()
         {
@@ -50,64 +33,56 @@ namespace RiichiReign.UnityComponent
             }
         }
 
-        public void RegisterPlayer(PlayerUIController playerUI)
+        public void RegisterPlayer(PlayerBehaviour player)
         {
-            _playerUI = playerUI;
             Debug.Log($"[{GetType().Name}] Sending ID to server...");
-            ServerManager.Instance.RegisterPlayerServerRpc();
+            ServerManager.Instance.RegisterPlayerServerRpc(player.PlayerID);
         }
 
-        public void SetLocalPlayer(Player player)
+        public void FinalizePlayerObject()
         {
-            Debug.Log($"[{GetType().Name}] Setting LocalPlayer: {player}");
-            LocalPlayerID = player.PlayerID;
-        }
+            List<PlayerBehaviour> playerBehaviourList = FindObjectsByType<PlayerBehaviour>(
+                    FindObjectsSortMode.None
+                )
+                .ToList();
 
-        public void SetPlayerData(
-            string playerID,
-            int points,
-            int windValue,
-            bool isAddingEnabled = true
-        )
-        {
-            if (!StoredPlayerIDDataPair.ContainsKey(playerID) && !isAddingEnabled)
+            foreach (var playerBehaviour in playerBehaviourList)
             {
-                throw new System.Exception($"[{GetType().Name}] Player{playerID} doesn't exists!");
+                PlayerIDBehaviorPair[playerBehaviour.PlayerID] = playerBehaviour;
             }
-            else if (!StoredPlayerIDDataPair.ContainsKey(playerID))
+        }
+
+        public void SetPlayerData(string playerID, int points, int windValue)
+        {
+            PlayerBehaviour playerBehaviour = PlayerIDBehaviorPair[playerID];
+
+            if (playerBehaviour == null)
             {
-                Debug.Log($"[{GetType().Name}] Adding Player Data: {playerID}");
-                PlayerData data = new(points, windValue);
-                StoredPlayerIDDataPair[playerID] = data;
+                throw new Exception($"[{GetType().Name}] Player{playerID} doesn't exists!");
             }
             else
             {
                 Debug.Log($"[{GetType().Name}] Syncing Player Data: {playerID}");
-                StoredPlayerIDDataPair[playerID].Points = points;
-                StoredPlayerIDDataPair[playerID].WindValue = windValue;
+
+                playerBehaviour.UpdatePlayerData(points, windValue);
             }
         }
 
         public void InitializeLPlayerUI()
         {
-            _playerUI.InitializeGameView();
+            PlayerUIController.Instance.InitializeGameView();
         }
 
-        public void SyncLocalPlayerHand(PlayerHand newHand)
+        public void SyncPlayerHand(PlayerHand newHand)
         {
-            _playerUI.UpdateLocalPlayerHand(newHand);
+            PlayerBehaviour.LocalPlayerInstance.UpdatePlayerHand(newHand);
         }
 
-        public void SyncOpponentPlayerHand(OpponentHand opponentHand)
+        public void SyncPlayerHand(OpponentHand opponentHand)
         {
-            if (opponentHand.PlayerID == LocalPlayerID)
-            {
-                Debug.LogWarning(
-                    $"[{GetType().Name}] Receive INVISIBLE hand for LocalPlayer instead!"
-                );
-            }
+            PlayerBehaviour playerBehaviour = PlayerIDBehaviorPair[opponentHand.PlayerID];
 
-            _playerUI.UpdateOpponentPlayerHand(opponentHand);
+            playerBehaviour.UpdatePlayerHand(opponentHand);
         }
     }
 }

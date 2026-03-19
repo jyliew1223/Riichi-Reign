@@ -1,11 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework.Constraints;
 using RiichiReign.MahjongEngine;
-using RiichiReiign.UnityComponent;
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 
 namespace RiichiReign.UnityComponent
 {
@@ -73,7 +69,7 @@ namespace RiichiReign.UnityComponent
 
         public void HandleOnPlayerDataChanged(Player player)
         {
-            throw new NotImplementedException();
+            throw new System.NotImplementedException();
         }
 
         public void HandleOnPlayerHandChanged(Player player)

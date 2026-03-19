@@ -1,10 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using RiichiReign.MahjongEngine;
 using RiichiReign.UI;
 using RiichiReign.UnityComponent;
-using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.LowLevel;
 using UnityEngine.UIElements;
 
 namespace RiichiReign.UnityUIToolKitComponent
@@ -30,26 +29,30 @@ namespace RiichiReign.UnityUIToolKitComponent
     }
 
     [RequireComponent(typeof(UIDocument))]
-    public class PlayerUIController : NetworkBehaviour
+    public class PlayerUIController : MonoBehaviour
     {
+        public static PlayerUIController Instance { get; private set; }
         List<PlayerContainerElement> _containerList = new();
         Dictionary<string, PlayerContainerElement> _playerIDContainerPair = new();
 
-        public override void OnNetworkSpawn()
+        void Start()
         {
-            if (!IsOwner)
+            if (Instance != null && Instance != this)
             {
-                gameObject.SetActive(false);
+                Destroy(gameObject);
                 return;
             }
 
+            Instance = this;
             InitializeUIContainers();
-            Invoke(nameof(Register), 1f);
         }
 
-        private void Register()
+        void OnDestroy()
         {
-            PlayerManager.Instance.RegisterPlayer(this);
+            if (Instance == this)
+            {
+                Instance = null;
+            }
         }
 
         private void InitializeUIContainers()
@@ -95,48 +98,75 @@ namespace RiichiReign.UnityUIToolKitComponent
         {
             Debug.Log($"[{GetType().Name}] Initializing Game...");
 
-            int localWindValue = PlayerManager.Instance.LocalPLayerData.WindValue;
+            int localWindValue = PlayerBehaviour.LocalPlayerInstance.WindValue;
 
-            foreach (var pair in PlayerManager.Instance.StoredPlayerIDDataPair)
+            List<PlayerBehaviour> playerBehaviours = GameObject
+                .FindObjectsByType<PlayerBehaviour>(FindObjectsSortMode.None)
+                .ToList();
+
+            foreach (var playerBehaviour in playerBehaviours)
             {
-                int localIndex = (pair.Value.WindValue - localWindValue + 4) % 4;
-                _playerIDContainerPair[pair.Key] = _containerList[localIndex];
+                int localIndex = (playerBehaviour.WindValue - localWindValue + 4) % 4;
+                _playerIDContainerPair[playerBehaviour.PlayerID] = _containerList[localIndex];
             }
         }
 
-        public void UpdateLocalPlayerHand(PlayerHand hand)
+        public void UpdatePlayerHand(string playerID)
         {
-            Debug.Log($"[{GetType().Name}] Updating Local Player Hand...");
+            PlayerBehaviour playerBehaviour = PlayerManager.Instance.PlayerIDBehaviorPair[playerID];
+            PlayerContainerElement playerContainer = _playerIDContainerPair[playerID];
 
-            string localPlayerID = PlayerManager.Instance.LocalPlayerID;
+            Hand playerHand = playerBehaviour.PlayerHand;
 
-            if (hand.TempTile != null)
+            if (PlayerBehaviour.LocalPlayerInstance.PlayerID == playerID)
             {
-                TileElement element = new(hand.TempTile);
-                _playerIDContainerPair[localPlayerID].TempTileContainer.Add(element);
+                Debug.Log($"[{GetType().Name}] Updating Local Player Hand...");
+
+                if (playerHand is not PlayerHand localPlayerHand)
+                {
+                    throw new System.Exception(
+                        $"[{GetType().Name}] Assigning Non-PlayerHand data to local player!"
+                    );
+                }
+                else
+                {
+                    if (localPlayerHand.TempTile != null)
+                    {
+                        TileElement element = new(localPlayerHand.TempTile);
+                        _playerIDContainerPair[playerID].TempTileContainer.Add(element);
+                    }
+
+                    foreach (var tile in localPlayerHand.TilesInHand)
+                    {
+                        TileElement element = new(tile);
+                        _playerIDContainerPair[playerID].HandContainer.Add(element);
+                    }
+                }
             }
-
-            foreach (var tile in hand.TilesInHand)
+            else
             {
-                TileElement element = new(tile);
-                _playerIDContainerPair[localPlayerID].HandContainer.Add(element);
-            }
-        }
+                Debug.Log($"[{GetType().Name}] Updating Player {playerID} Hand...");
 
-        public void UpdateOpponentPlayerHand(OpponentHand opponentHand)
-        {
-            string playerID = opponentHand.PlayerID;
+                if (playerHand is not OpponentHand opponentPlayerHand)
+                {
+                    throw new System.Exception(
+                        $"[{GetType().Name}] Assigning PlayerHand data to Non-local player!"
+                    );
+                }
+                else
+                {
+                    if (opponentPlayerHand.HasTempTile)
+                    {
+                        TileElement element = new();
+                        _playerIDContainerPair[playerID].TempTileContainer.Add(element);
+                    }
 
-            if (opponentHand.HasTempTile)
-            {
-                TileElement element = new();
-                _playerIDContainerPair[playerID].TempTileContainer.Add(element);
-            }
-
-            for (int i = 0; i < opponentHand.TileCount; i++)
-            {
-                TileElement element = new();
-                _playerIDContainerPair[playerID].HandContainer.Add(element);
+                    for (int i = 0; i < opponentPlayerHand.TileCount; i++)
+                    {
+                        TileElement element = new();
+                        _playerIDContainerPair[playerID].HandContainer.Add(element);
+                    }
+                }
             }
         }
     }

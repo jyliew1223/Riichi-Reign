@@ -8,7 +8,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
-namespace RiichiReiign.UnityComponent
+namespace RiichiReign.UnityComponent
 {
     struct PlayerDataPacket
     {
@@ -63,7 +63,7 @@ namespace RiichiReiign.UnityComponent
         }
 
         [Rpc(SendTo.Server)]
-        public void RegisterPlayerServerRpc(RpcParams rpcParams = default)
+        public void RegisterPlayerServerRpc(string playerID, RpcParams rpcParams = default)
         {
             if (!IsServer)
                 throw new System.Exception(
@@ -75,9 +75,6 @@ namespace RiichiReiign.UnityComponent
             Debug.Log(
                 $"[{GetType().Name}][Server] Client ID({clientID}) Received. Creating new player."
             );
-
-            // temp random player ID
-            string playerID = System.Guid.NewGuid().ToString();
 
             Player newPlayer = GameManager.Instance.AddPlayer(playerID);
             string json = JsonConvert.SerializeObject(newPlayer);
@@ -114,8 +111,6 @@ namespace RiichiReiign.UnityComponent
                 sb.AppendLine($"Player: {returnedlPlayer}");
 
                 Debug.Log(sb.ToString());
-
-                PlayerManager.Instance.SetLocalPlayer(returnedlPlayer);
             }
             else
             {
@@ -155,13 +150,14 @@ namespace RiichiReiign.UnityComponent
                 json
             );
 
+            PlayerManager.Instance.FinalizePlayerObject();
+
             foreach (var packet in packets)
             {
                 PlayerManager.Instance.SetPlayerData(
                     packet.PlayerID,
                     packet.Points,
-                    packet.WindValue,
-                    true
+                    packet.WindValue
                 );
             }
 
@@ -214,7 +210,7 @@ namespace RiichiReiign.UnityComponent
             Debug.Log($"[{GetType().Name}][Client] Received REAL hand data.");
             PlayerHand myHand = JsonConvert.DeserializeObject<PlayerHand>(json);
 
-            PlayerManager.Instance.SyncLocalPlayerHand(myHand);
+            PlayerManager.Instance.SyncPlayerHand(myHand);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
@@ -229,7 +225,7 @@ namespace RiichiReiign.UnityComponent
             );
             OpponentHand oppHand = JsonConvert.DeserializeObject<OpponentHand>(json);
 
-            PlayerManager.Instance.SyncOpponentPlayerHand(oppHand);
+            PlayerManager.Instance.SyncPlayerHand(oppHand);
         }
     }
 }
