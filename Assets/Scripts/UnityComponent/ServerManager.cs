@@ -1,9 +1,7 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using RiichiReign.MahjongEngine;
-using RiichiReign.UnityComponent;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -190,22 +188,16 @@ namespace RiichiReign.UnityComponent
 
             SyncRealHandClientRpc(
                 myHandJson,
-                clientID,
                 new RpcParams { Send = new RpcSendParams { Target = sendToOwner } }
             );
             SyncInvisibleHandClientRpc(
                 opponentHandJson,
-                clientID,
                 new RpcParams { Send = new RpcSendParams { Target = sendToOthers } }
             );
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        public void SyncRealHandClientRpc(
-            string json,
-            ulong clientID,
-            RpcParams rpcParams = default
-        )
+        public void SyncRealHandClientRpc(string json, RpcParams rpcParams = default)
         {
             Debug.Log($"[{GetType().Name}][Client] Received REAL hand data.");
             PlayerHand myHand = JsonConvert.DeserializeObject<PlayerHand>(json);
@@ -214,18 +206,34 @@ namespace RiichiReign.UnityComponent
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        public void SyncInvisibleHandClientRpc(
-            string json,
-            ulong clientID,
-            RpcParams rpcParams = default
-        )
+        public void SyncInvisibleHandClientRpc(string json, RpcParams rpcParams = default)
         {
-            Debug.Log(
-                $"[{GetType().Name}][Client] Received INVISIBLE hand data for Player {clientID}."
-            );
             OpponentHand oppHand = JsonConvert.DeserializeObject<OpponentHand>(json);
 
+            Debug.Log(
+                $"[{GetType().Name}][Client] Received INVISIBLE hand data for Player {oppHand.PlayerID}."
+            );
             PlayerManager.Instance.SyncPlayerHand(oppHand);
+        }
+
+        public void RequestPlayerAction(List<GameAction> availableActions, string targetPlayerID)
+        {
+            ulong clientID = _playerIDClientIDPair[targetPlayerID];
+
+            var sendTo = RpcTarget.Single(clientID, RpcTargetUse.Temp);
+
+            string json = JsonConvert.SerializeObject(availableActions);
+
+            RequestPlayerActionRpc(
+                json,
+                new RpcParams { Send = new RpcSendParams { Target = sendTo } }
+            );
+        }
+
+        [Rpc(SendTo.SpecifiedInParams)]
+        private void RequestPlayerActionRpc(string json, RpcParams rpcParams = default)
+        {
+            
         }
     }
 }

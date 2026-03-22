@@ -118,6 +118,8 @@ namespace RiichiReign.UnityUIToolKitComponent
 
             Hand playerHand = playerBehaviour.PlayerHand;
 
+            playerContainer.Clear();
+
             if (PlayerBehaviour.LocalPlayerInstance.PlayerID == playerID)
             {
                 Debug.Log($"[{GetType().Name}] Updating Local Player Hand...");
@@ -133,13 +135,13 @@ namespace RiichiReign.UnityUIToolKitComponent
                     if (localPlayerHand.TempTile != null)
                     {
                         TileElement element = new(localPlayerHand.TempTile);
-                        _playerIDContainerPair[playerID].TempTileContainer.Add(element);
+                        playerContainer.TempTileContainer.Add(element);
                     }
 
                     foreach (var tile in localPlayerHand.TilesInHand)
                     {
                         TileElement element = new(tile);
-                        _playerIDContainerPair[playerID].HandContainer.Add(element);
+                        playerContainer.HandContainer.Add(element);
                     }
                 }
             }
@@ -158,13 +160,13 @@ namespace RiichiReign.UnityUIToolKitComponent
                     if (opponentPlayerHand.HasTempTile)
                     {
                         TileElement element = new();
-                        _playerIDContainerPair[playerID].TempTileContainer.Add(element);
+                        playerContainer.TempTileContainer.Add(element);
                     }
 
                     for (int i = 0; i < opponentPlayerHand.TileCount; i++)
                     {
                         TileElement element = new();
-                        _playerIDContainerPair[playerID].HandContainer.Add(element);
+                        playerContainer.HandContainer.Add(element);
                     }
                 }
             }

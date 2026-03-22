@@ -49,30 +49,35 @@ namespace RiichiReign.UnityComponent
 
         public void StartGame()
         {
-            GameEngine game = new(
-                _playerList,
-                _playerCount,
-                HandleOnGameStart,
+            MahjongGame game = new(
+                HandleOnGameInitialized,
                 HandleOnPlayerDataChanged,
+                HandleOnWaitingPlayerReaction,
                 HandleOnPlayerHandChanged,
                 Debug.Log
             );
+            game.InitGame(_playerList, _playerCount);
             game.StartGame();
         }
 
-        public void HandleOnGameStart(List<Player> playerList)
+        void HandleOnGameInitialized(List<Player> playerList)
         {
             Debug.Log($"[{GetType().Name}] Resolving OnGameStart...");
 
             ServerManager.Instance.InitializeClientGame(playerList);
         }
 
-        public void HandleOnPlayerDataChanged(Player player)
+        void HandleOnPlayerDataChanged(Player player)
         {
             throw new System.NotImplementedException();
         }
 
-        public void HandleOnPlayerHandChanged(Player player)
+        void HandleOnWaitingPlayerReaction(List<GameAction> availableActions, string targetPlayerID)
+        {
+            ServerManager.Instance.RequestPlayerAction(availableActions, targetPlayerID);
+        }
+
+        void HandleOnPlayerHandChanged(Player player)
         {
             StringBuilder sb = new();
 

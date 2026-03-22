@@ -1,0 +1,79 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Unity.VisualScripting;
+
+namespace RiichiReign.MahjongEngine
+{
+    public class MahjongGame
+    {
+        List<Player> _playerList = new();
+        int _playerCount;
+
+        event Action<List<Player>> _onGameInitialized;
+        event Action<Player> _onPlayerDataChanged;
+        event Action<List<GameAction>, string> _onWaitingPlayerReaction;
+        event Action<Player> _onPlayerHandChanged;
+        event Action<string> _log;
+
+        public MahjongGame(
+            Action<List<Player>> onGameInitializedResolver,
+            Action<Player> onPlayerDataChangedResolver,
+            Action<List<GameAction>, string> onWaitingPlayerReactionResolver,
+            Action<Player> onPlayerHandChangedResolver,
+            Action<string> logger
+        )
+        {
+            _onGameInitialized = onGameInitializedResolver;
+            _onPlayerDataChanged = onPlayerDataChangedResolver;
+            _onWaitingPlayerReaction = onWaitingPlayerReactionResolver;
+            _onPlayerHandChanged = onPlayerHandChangedResolver;
+            _log = logger;
+        }
+
+        public void InitGame(List<Player> playerList, int playerCount)
+        {
+            if (playerList.Count < _playerCount)
+                throw new Exception(
+                    $"Not enough players to init a game, current player count: {_playerList.Count}"
+                );
+
+            _playerList = playerList;
+            _playerCount = playerCount;
+
+            _log?.Invoke($"[{GetType().Name}] Initializing Player...");
+
+            int windValue = 1;
+            foreach (var player in _playerList)
+            {
+                player.SetWindValue(windValue++);
+                player.SetPoint(25000);
+            }
+
+            _onGameInitialized?.Invoke(_playerList);
+        }
+
+        public async void StartGame()
+        {
+            _log?.Invoke($"Starting Game with player count: {_playerList.Count}");
+            await GameRoutine();
+        }
+
+        public async Task GameRoutine()
+        {
+            // Turn Loop to be Implement
+            {
+                // Reset Player Hand
+                foreach (var player in _playerList)
+                {
+                    player.ResetHand();
+                }
+
+                MahjongRound round = new(_onWaitingPlayerReaction, _onPlayerHandChanged, _log);
+                round.InitRound(_playerList, _playerCount);
+                await round.StartRound();
+                await round.TurnRoutine();
+            }
+        }
+    }
+}

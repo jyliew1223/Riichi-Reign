@@ -6,9 +6,9 @@ namespace RiichiReign.MahjongEngine
     public struct PlayerReaction
     {
         public Player Player { get; private set; }
-        public PlayerAction Reaction { get; private set; }
+        public GameAction Reaction { get; private set; }
 
-        internal PlayerReaction(Player player, PlayerAction reaction)
+        internal PlayerReaction(Player player, GameAction reaction)
         {
             this.Player = player;
             this.Reaction = reaction;
