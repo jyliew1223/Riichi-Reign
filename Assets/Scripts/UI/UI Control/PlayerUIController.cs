@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using RiichiReign.MahjongEngine;
+using RiichiReign.DataPackets;
 using RiichiReign.UI;
 using RiichiReign.UnityComponent;
 using UnityEngine;
@@ -116,7 +116,7 @@ namespace RiichiReign.UnityUIToolKitComponent
             PlayerBehaviour playerBehaviour = PlayerManager.Instance.PlayerIDBehaviorPair[playerID];
             PlayerContainerElement playerContainer = _playerIDContainerPair[playerID];
 
-            Hand playerHand = playerBehaviour.PlayerHand;
+            HandPacket playerHand = playerBehaviour.PlayerHand;
 
             playerContainer.Clear();
 
@@ -124,7 +124,7 @@ namespace RiichiReign.UnityUIToolKitComponent
             {
                 Debug.Log($"[{GetType().Name}] Updating Local Player Hand...");
 
-                if (playerHand is not PlayerHand localPlayerHand)
+                if (playerHand is not PlayerHandPacket localPlayerHand)
                 {
                     throw new System.Exception(
                         $"[{GetType().Name}] Assigning Non-PlayerHand data to local player!"
@@ -149,7 +149,7 @@ namespace RiichiReign.UnityUIToolKitComponent
             {
                 Debug.Log($"[{GetType().Name}] Updating Player {playerID} Hand...");
 
-                if (playerHand is not OpponentHand opponentPlayerHand)
+                if (playerHand is not OpponentHandPacket opponentPlayerHand)
                 {
                     throw new System.Exception(
                         $"[{GetType().Name}] Assigning PlayerHand data to Non-local player!"

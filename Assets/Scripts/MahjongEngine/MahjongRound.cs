@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Unity.PlasticSCM.Editor.WebApi;
 
 namespace RiichiReign.MahjongEngine
 {
     internal class MahjongRound
     {
+        GameEventHub _eventHub;
         Wall wall;
         int _playerCount;
         Dictionary<int, Player> _windValuePlayerPair = new();
@@ -15,14 +15,13 @@ namespace RiichiReign.MahjongEngine
         event Action<Player> _onPlayerHandChanged;
         event Action<string> _log;
 
-        public MahjongRound(
-            Action<List<GameAction>, string> _onWaitingPlayerReaction,
-            Action<Player> onPlayerHandChangedResolver,
-            Action<string> logger
-        )
+        public MahjongRound(GameEventHub eventHub)
         {
-            _onPlayerHandChanged = onPlayerHandChangedResolver;
-            _log = logger;
+            _eventHub = eventHub;
+
+            _onWaitingPlayerReaction = _eventHub.RaiseRequestPlayerReaction;
+            _onPlayerHandChanged = _eventHub.RaisePlayerHandChanged;
+            _log = _eventHub.RaiseLog;
         }
 
         public void InitRound(List<Player> playerList, int playerCount)
@@ -79,7 +78,7 @@ namespace RiichiReign.MahjongEngine
                 }
 
                 Player currentPlayer = _windValuePlayerPair[currentWind];
-                int nextWind = ((currentWind + 1) % _playerCount) + 1;
+                int nextWind = (currentWind % _playerCount) + 1;
 
                 StringBuilder sb = new();
 
@@ -109,7 +108,7 @@ namespace RiichiReign.MahjongEngine
                     break;
                 }
 
-                await Task.Delay((int)(DebugTimeControl.Instance.m_turnTimeLoop * 1000));
+                await Task.Delay(500);
 
                 switch (currentPhase)
                 {

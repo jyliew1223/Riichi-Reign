@@ -1,34 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.VisualScripting;
 
 namespace RiichiReign.MahjongEngine
 {
     public class MahjongGame
     {
+        GameEventHub _eventHub;
         List<Player> _playerList = new();
         int _playerCount;
 
-        event Action<List<Player>> _onGameInitialized;
-        event Action<Player> _onPlayerDataChanged;
-        event Action<List<GameAction>, string> _onWaitingPlayerReaction;
-        event Action<Player> _onPlayerHandChanged;
+        event Action<List<Player>> _onGameInit;
         event Action<string> _log;
 
-        public MahjongGame(
-            Action<List<Player>> onGameInitializedResolver,
-            Action<Player> onPlayerDataChangedResolver,
-            Action<List<GameAction>, string> onWaitingPlayerReactionResolver,
-            Action<Player> onPlayerHandChangedResolver,
-            Action<string> logger
-        )
+        public MahjongGame(GameEventHub eventHub)
         {
-            _onGameInitialized = onGameInitializedResolver;
-            _onPlayerDataChanged = onPlayerDataChangedResolver;
-            _onWaitingPlayerReaction = onWaitingPlayerReactionResolver;
-            _onPlayerHandChanged = onPlayerHandChangedResolver;
-            _log = logger;
+            _eventHub = eventHub;
+            _onGameInit = _eventHub.RaiseGameInit;
+            _log = _eventHub.RaiseLog;
         }
 
         public void InitGame(List<Player> playerList, int playerCount)
@@ -50,7 +39,7 @@ namespace RiichiReign.MahjongEngine
                 player.SetPoint(25000);
             }
 
-            _onGameInitialized?.Invoke(_playerList);
+            _onGameInit?.Invoke(_playerList);
         }
 
         public async void StartGame()
@@ -69,7 +58,7 @@ namespace RiichiReign.MahjongEngine
                     player.ResetHand();
                 }
 
-                MahjongRound round = new(_onWaitingPlayerReaction, _onPlayerHandChanged, _log);
+                MahjongRound round = new(_eventHub);
                 round.InitRound(_playerList, _playerCount);
                 await round.StartRound();
                 await round.TurnRoutine();

@@ -1,4 +1,4 @@
-using RiichiReign.MahjongEngine;
+using RiichiReign.DataPackets;
 using RiichiReign.UnityUIToolKitComponent;
 using Unity.Collections;
 using Unity.Netcode;
@@ -8,16 +8,17 @@ namespace RiichiReign.UnityComponent
     public class PlayerBehaviour : NetworkBehaviour
     {
         public static PlayerBehaviour LocalPlayerInstance { get; private set; }
-        public Hand PlayerHand { get; private set; } = null;
+        public HandPacket PlayerHand { get; private set; } = null;
         private NetworkVariable<FixedString64Bytes> _networkPlayerID = new(
             "Player",
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Owner
         );
+
         public string PlayerID
         {
             get => _networkPlayerID.Value.ToString();
-            set => _networkPlayerID.Value = value;
+            private set => _networkPlayerID.Value = value;
         }
 
         public int Points { get; private set; }
@@ -49,40 +50,33 @@ namespace RiichiReign.UnityComponent
             PlayerManager.Instance.RegisterPlayer(this);
         }
 
-        public void SetPlayerData(string playerID, int points, int windValue)
+        public void UpdatePlayerData(PlayerDataPacket packet)
         {
-            if (IsOwner)
-                throw new System.Exception($"[{GetType().Name}] Cannot set local player ID!");
+            if (packet.PlayerID != PlayerID)
+                throw new System.Exception($"[{GetType().Name}] Player ID not match!");
 
-            PlayerID = playerID;
-            Points = points;
-            WindValue = windValue;
+            Points = packet.Points;
+            WindValue = packet.WindValue;
         }
 
-        public void UpdatePlayerData(int points, int windValue)
-        {
-            Points = points;
-            WindValue = windValue;
-        }
-
-        public void UpdatePlayerHand(PlayerHand localPlayerHand)
+        public void UpdatePlayerHand(PlayerHandPacket packet)
         {
             if (!IsOwner)
                 throw new System.Exception($"[{GetType().Name}] Instance is not own by owner!");
 
-            PlayerHand = localPlayerHand;
-            PlayerUIController.Instance.UpdatePlayerHand(PlayerID);
+            PlayerHand = packet;
+            PlayerUIController.Instance.UpdatePlayerHand(LocalPlayerInstance.PlayerID);
         }
 
-        public void UpdatePlayerHand(OpponentHand opponentHand)
+        public void UpdatePlayerHand(OpponentHandPacket packet)
         {
-            if (IsOwner || opponentHand.PlayerID == LocalPlayerInstance.PlayerID)
+            if (IsOwner || packet.PlayerID == LocalPlayerInstance.PlayerID)
                 throw new System.Exception(
                     $"[{GetType().Name}] Updating Owner Hand with OpponentHand object!"
                 );
 
-            PlayerHand = opponentHand;
-            PlayerUIController.Instance.UpdatePlayerHand(PlayerID);
+            PlayerHand = packet;
+            PlayerUIController.Instance.UpdatePlayerHand(packet.PlayerID);
         }
     }
 }

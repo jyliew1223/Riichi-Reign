@@ -5,39 +5,7 @@ using Newtonsoft.Json;
 
 namespace RiichiReign.MahjongEngine
 {
-    [Serializable]
-    public abstract class Hand { }
-
-    [Serializable]
-    public class OpponentHand : Hand
-    {
-        [JsonProperty("playerID")]
-        public string PlayerID;
-
-        [JsonProperty("tileCount")]
-        public int TileCount;
-
-        [JsonProperty("hasTempTile")]
-        public bool HasTempTile;
-
-        public OpponentHand(string playerID, PlayerHand hand)
-        {
-            PlayerID = playerID;
-            TileCount = hand.TilesInHand.Count;
-            HasTempTile = hand.TempTile != null;
-        }
-
-        [JsonConstructor]
-        private OpponentHand(string playerID, int tileCount, bool hasTempTile)
-        {
-            PlayerID = playerID;
-            TileCount = tileCount;
-            HasTempTile = hasTempTile;
-        }
-    }
-
-    [Serializable]
-    public class PlayerHand : Hand
+    public class PlayerHand
     {
         [JsonProperty("tempTile")]
         public Tile TempTile { get; private set; }

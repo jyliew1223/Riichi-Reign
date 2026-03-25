@@ -12,44 +12,39 @@ namespace RiichiReign.MahjongEngine
             bool hadRiichi = false;
             List<GameAction> availableActions = new();
 
+            if (hadRiichi)
+            {
+                GameAction tempTileAction = new(MahjongAction.Discard, hand.TempTile);
+                availableActions.Add(tempTileAction);
+
+                return availableActions;
+            }
+
             // Changed this for condition that don't accpet discard tile
             if (true)
             {
-                AddDiscardTiles(hand, ref availableActions, hadRiichi);
+                AddDiscardTiles(hand.TilesInHand, ref availableActions);
             }
 
-            if (hadRiichi)
-                return availableActions;
+            List<Tile> fullHand = new(hand.TilesInHand) { hand.TempTile };
 
-            List<Tile> tiles = new(hand.TilesInHand) { hand.TempTile };
-
-            CheckKan(tiles, ref availableActions);
+            CheckKan(fullHand, ref availableActions);
 
             return availableActions;
         }
 
-        static void AddDiscardTiles(
-            PlayerHand hand,
-            ref List<GameAction> availableAction,
-            bool hadRiichi = false
-        )
+        static void AddDiscardTiles(List<Tile> tilesInHand, ref List<GameAction> availableActions)
         {
-            GameAction tempTileAction = new(MahjongAction.Discard, hand.TempTile);
-            availableAction.Add(tempTileAction);
-
-            if (hadRiichi)
-                return;
-
-            foreach (var tile in hand.TilesInHand)
+            foreach (var tile in tilesInHand)
             {
                 GameAction action = new(MahjongAction.Discard, tile);
-                availableAction.Add(action);
+                availableActions.Add(action);
             }
         }
 
-        static void CheckKan(List<Tile> tiles, ref List<GameAction> availableActions)
+        static void CheckKan(List<Tile> fullHand, ref List<GameAction> availableActions)
         {
-            var grouped = tiles.GroupBy(t => t);
+            var grouped = fullHand.GroupBy(t => t);
 
             foreach (var group in grouped)
             {
